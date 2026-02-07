@@ -1,0 +1,56 @@
+#########################################################
+# ملف: public/.htaccess
+# هذا هو ملف Laravel الداخلي الموجود داخل مجلد public
+# وظيفته: إدارة الطلبات بعد وصولها إلى تطبيق Laravel
+#########################################################
+
+<IfModule mod_rewrite.c>
+
+    # منع تعدد طرق الوصول للملفات + منع استعراض المجلدات
+    <IfModule mod_negotiation.c>
+        Options -MultiViews -Indexes
+    </IfModule>
+
+    # تفعيل إعادة الكتابة (أساسي لعمل Laravel)
+    RewriteEngine On
+
+    #####################################################
+    # 1) التعامل مع الهيدرز الأمنية الخاصة بالمصادقة
+    #####################################################
+
+    # تمرير هيدر Authorization إلى PHP/Laravel
+    RewriteCond %{HTTP:Authorization} .
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+    # تمرير هيدر X-XSRF-TOKEN إلى Laravel
+    RewriteCond %{HTTP:x-xsrf-token} .
+    RewriteRule .* - [E=HTTP_X_XSRF_TOKEN:%{HTTP:X-XSRF-Token}]
+
+    #####################################################
+    # 2) تنظيف الروابط من السلاش الزائد في النهاية
+    #####################################################
+
+    # إذا كان الطلب ينتهي بـ "/" وليس مجلدًا حقيقيًا:
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_URI} (.+)/$
+    RewriteRule ^ %1 [L,R=301]
+
+    #####################################################
+    # 3) توجيه كل الطلبات غير الموجودة إلى index.php
+    #    (قلب نظام Laravel)
+    #####################################################
+
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^ index.php [L]
+
+</IfModule>
+
+#########################################################
+# 4) السماح بالوصول إلى الملفات داخل public/storage
+#    (حتى يمكن عرض الصور المخزنة)
+#########################################################
+
+<IfModule mod_authz_core.c>
+    Require all granted
+</IfModule>
