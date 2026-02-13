@@ -204,13 +204,13 @@
                             <div class="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center text-accent">
                                 <i class="fa-solid fa-phone"></i>
                             </div>
-                            <span dir="ltr">{{ $settings['phone'] ?? '+966 5 3279 1522' }}</span>
+                            <span dir="ltr"><a href="tel:{{ $settings['phone'] ?? '+966 5 3279 1522' }}">{{ $settings['phone'] ?? '+966 5 3279 1522' }}</a></span>
                         </li>
                         <li class="flex items-center gap-3">
                             <div class="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center text-accent">
-                                <i class="fa-solid fa-envelope"></i>
+                                <i class="fab fa-whatsapp"></i>
                             </div>
-                            <span> {{ $settings['email'] ?? 'info@example.com' }}</span>
+                            <span> <a href="{{ $settings['whatsapp'] ?? '+966532791522' }}" target="_blank" class="hover:text-accent">{{ $settings['phone'] ?? '+966 5 3279 1522' }}</a></span>
                         </li>
                     </ul>
                     <a href="{{ route('contact') }}"

@@ -10,18 +10,19 @@
         {{$meta_title ?? null ? $meta_title .' | '. ($settings['site_name'] ?? config('app.name', 'أفضل معلم دهانات وديكورات جدة')) : $settings['site_name'] ?? config('app.name', ' أفضل معلم دهانات وديكورات في جدة ') .' | '. ($page_title ?? 'الصفحة الرئيسية')}}
     </title>
     @if (!empty($meta_description ?? null))
-    <meta name="description" content="{{ $meta_description }}">
+    <meta name="description" content="{{Str::limit(strip_tags($meta_description ?? ''), 160)}}"> {{-- تأكد من أن الوصف لا يتجاوز 160 حرفًا --}}
     @endif
     @if (!empty($meta_keywords ?? null))
-    <meta name="keywords" content="{{ $meta_keywords }}">
+    <meta name="keywords" content="{{ is_array($meta_keywords) ? implode(', ', $meta_keywords) : $meta_keywords }}">
     @endif
 
     <meta name="author" content="{{ 'معلم دهانات وديكورات جدة ت: 0532791522' ?? $settings['site_name']  }}">
-    <meta name="robots" content="index, follow">
+    {{-- <meta name="robots" content="index, follow"> --}}
+    <meta name="robots" content="follow, index, max-snippet:-1, max-video-preview:-1, max-image-preview:large">
     <meta name="theme-color" content="#0A192F">
 
     {{-- ===== Canonical (مهم جدًا للسيو) ===== --}}
-    <!--<link rel="canonical" href="{{ url()->current() }}">-->
+    {{-- <!--<link rel="canonical" href="{{ url()->current() }}">--> --}}
     <link rel="canonical" href="{{ url()->full() }}">
 
     <meta name="google-site-verification" content="_lMgioCLkmTGQmIVOxTCzpYviw6IC71fpk3xgCBxvXU" />
@@ -134,6 +135,9 @@
     <link rel="preload" href="{{ asset('assets/css/style.css') }}" as="style">
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
+
+    {{-- Sitemap --}}
+    <link rel="sitemap" type="application/xml" title="Sitemap" href="{{ asset('sitemap.xml') }}">
 
     @include('partials.schema')
 </head>

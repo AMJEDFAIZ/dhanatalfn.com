@@ -1,19 +1,17 @@
 User-agent: *
 Disallow:
 
-
-# منع الوصول لملفات النظام والصفحات الحساسة
+# Prevent access to system files and sensitive pages
 Disallow: /config/
-#Disallow: /storage/
 Disallow: /vendor/
 Disallow: /admin/login
 
-# السماح بالوصول للملفات العامة
-
+# Allow access to public files
 Allow: /assets/
 Allow: /storage/
-Allow: /storage/app/public/
 Allow: /sitemap.xml
+Allow: /sitemap.xml.gz
 
-# ربط خريطة الموقع التي قمنا بإنشائها
+# Sitemaps
 Sitemap: https://dhanatalfn.com/sitemap.xml
+Sitemap: https://dhanatalfn.com/sitemap.xml.gz

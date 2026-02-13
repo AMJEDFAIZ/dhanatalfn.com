@@ -13,7 +13,7 @@ class BlogController extends Controller
         $posts = BlogPost::where('active', true)->orderBy('published_at', 'desc')->paginate(9);
         $meta_title = Setting::where('key', 'blog_meta_title')->value('value') ?? 'المدونة';
         $meta_description = Setting::where('key', 'blog_meta_description')->value('value') ?? 'اقرأ أحدث المقالات والنصائح في مجال المقاولات والبناء.';
-        $meta_keywords = collect($posts->pluck('title')->take(5))->implode(', ');
+        $meta_keywords = collect($posts->pluck('title')->take(10))->implode(', ');
 
         return view('blog.index', compact('posts', 'meta_title', 'meta_description', 'meta_keywords'));
     }
