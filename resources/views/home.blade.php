@@ -15,18 +15,16 @@
 
         <div class="container mx-auto px-4 relative z-10 text-center text-white pt-20">
             <span
-                class="inline-block py-1 px-3 rounded-full bg-accent/20 border border-accent/50 text-accent text-lg font-semibold mb-4 animate-fade-in-up">
-                الفـن الـحـديـث</span>
+                class="inline-block py-1 px-3 rounded-full bg-accent/20 border border-accent/50 text-accent text-lg font-semibold mb-4  animate-fade-in-up">
+               أفضل معلم دهانات وديكورات في جدة</span>
             <h1
                 class="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight animate-fade-in-up animation-delay-200">
                 معلم دهانات<br> <span class="text-transparent bg-clip-text bg-gradient-to-r from-accent to-white">وديكورات
-                    في جدة</span>
+                    جدة</span>
             </h1>
             <p class="text-2x1 bold md:text-xl text-white  max-w-2xl mx-auto mb-10 animate-fade-in-up animation-delay-400">
-                نحن الفن الحديث للدهانات والديكورات
-                نقدم مجموعة واسعة من الخدمات المتخصصة في مجال الديكور والتشطيبات الداخلية والخارجية في منطقة جدة. نحن
-                متخصصون في تنفيذ وتنسيق أعمال الدهانات
-                والتصميمات الجدارية للمنازل والمباني التجارية والمكاتب. </p>
+            <span class="text-accent font-bold">أفضل معلم دهانات وديكورات جدة </span>المتخصص في تقديم أفضل خدمات الدهانات والتشطيبات والديكور في <span class="font-bold">جدة – حي الروضة </span>والمناطق المجاورة. نحن نقدم حلولاً شاملة لتجديد المنازل والفلل والمكاتب، من دهانات داخلية وخارجية عالية الجودة إلى تصميمات جبس بورد العصرية وديكورات بديل الخشب والرخام وورق الجدران.
+             </p>
             <div class="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in-up animation-delay-600">
                 <a href="{{ route('projects.index') }}"
                     class="bg-accent hover:bg-yellow-600 text-white px-8 py-4 rounded-lg font-bold transition-all shadow-lg hover:shadow-accent/50 transform hover:-translate-y-1 flex items-center justify-center gap-3">
@@ -70,19 +68,24 @@
                     </div>
                     <h2 class="text-3xl md:text-4xl font-bold text-primary mb-6">شريكك الموثوق في الدهان والديكور</h2>
                     <p class="text-gray-600 leading-relaxed mb-6 text-lg">
-                        دهانات وديكورات <span class="text-accent font-bold">الفن الحديث</span> تقدم أفضل معلم الدهانات
-                        والديكورات في <span class="font-bold">جدة</span>، وجميع مناطقها، حيث نتميز بالجودة
-                        العالية والاحترافية في العمل. نقدم مجموعة متنوعة من خدمات الدهانات الداخلية والخارجية باستخدام أحدث
-                        التقنيات وأفضل المواد لضمان مظهر جذاب وحماية تدوم طويلاً. كما نوفر تصميم وتنفيذ ديكورات عصرية مثل
-                        الفوم، الجبس بورد، بديل الرخام والخشب، لنضفي لمسة من الفخامة والأناقة على منازلكم ومكاتبكم. فريقنا
-                        المتخصص يعمل على تحقيق رؤيتكم بكل دقة واحترافية، مع الالتزام بالمواعيد وأسعار تنافسية ترضي جميع
-                        العملاء.
+                        <!--<span class="text-accent font-bold">معلم دهانات وديكورات جدة </span>-->
+                        <!--<span class="font-bold">حي الروضة – جدة </span>-->
+                        
+                        <span class="text-accent font-bold">معلم دهانات وديكورات جدة </span>المتخصص في تقديم أفضل خدمات الدهانات والتشطيبات والديكور في <span class="font-bold">حي الروضة – جدة </span>والمناطق المجاورة. نحن نقدم حلولاً شاملة لتجديد المنازل والفلل والمكاتب، من دهانات داخلية وخارجية عالية الجودة إلى تصميمات جبس بورد العصرية وديكورات بديل الخشب والرخام وورق الجدران. نقوم باستخدام أفضل أنواع الدهانات المقاومة للرطوبة سهلة التنظيف تحت إشراف فنيين محترفين يضمنون نتائج دقيقة ولون موحد وملمس ناعم. يسعدنا أن نساعدكم في تحويل منازلكم إلى مساحات أنيقة وعصرية تعكس شخصيتكم، وذلك عبر خبرتنا الطويلة وجودة العمل الممتازة.
+                        
+                        <!--دهانات وديكورات <span class="text-accent font-bold">الفن الحديث</span> تقدم أفضل معلم الدهانات-->
+                        <!--والديكورات في <span class="font-bold">جدة</span>، وجميع مناطقها، حيث نتميز بالجودة-->
+                        <!--العالية والاحترافية في العمل. نقدم مجموعة متنوعة من خدمات الدهانات الداخلية والخارجية باستخدام أحدث-->
+                        <!--التقنيات وأفضل المواد لضمان مظهر جذاب وحماية تدوم طويلاً. كما نوفر تصميم وتنفيذ ديكورات عصرية مثل-->
+                        <!--الفوم، الجبس بورد، بديل الرخام والخشب، لنضفي لمسة من الفخامة والأناقة على منازلكم ومكاتبكم. فريقنا-->
+                        <!--المتخصص يعمل على تحقيق رؤيتكم بكل دقة واحترافية، مع الالتزام بالمواعيد وأسعار تنافسية ترضي جميع-->
+                        <!--العملاء.-->
                     </p>
 
 
                     <div class="border-r-4 border-accent pr-6 mb-8 bg-gray-50 p-4 rounded-r-lg">
                         <p class="text-primary font-bold italic text-lg">
-                            " معلم دهانات وديكورات جدة ، لأعمال الدهان والديكور."
+                            "معلم دهانات وديكورات حي الروضه بجدة ، لأعمال الدهان والديكور."
                         </p>
                         <span class="block mt-2 text-sm text-gray-500">- المعلم احمد</span>
                     </div>

@@ -1,7 +1,7 @@
 @extends('layouts.site')
 
 @section('title', ' تواصل معنا')
-@section('meta_title', $settings['site_name'] ?? config('app.name', 'الفن الحديث'))
+@section('meta_title', $settings['site_name'] ?? config('app.name', 'أفضل معلم دهانات وديكورات في جدة'))
 @section('meta_description', $settings['site_description'] ?? null)
 @section('meta_keywords',
     collect([$settings['site_name'] ?? null, 'تواصل معنا', 'تواصل', 'الاتصال', 'دهانات', 'ديكورات', 'الفن الحديث', ' معلم دهانات وديكورات', 'معلم دهانات جدة', 'معلم دهانات'])->filter()->implode(', '))

@@ -16,4 +16,4 @@ Allow: /storage/app/public/
 Allow: /sitemap.xml
 
 # ربط خريطة الموقع التي قمنا بإنشائها
-Sitemap: https://dhanatalfn.com
+Sitemap: https://dhanatalfn.com/sitemap.xml

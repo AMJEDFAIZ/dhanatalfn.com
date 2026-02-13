@@ -7,7 +7,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>
-        {{ $meta_title ?? null ? $meta_title . ' | ' . ($settings['site_name'] ?? config('app.name', 'الفن الحديث للدهانات والديكور')) : $settings['site_name'] ?? config('app.name', ' الفـن الـحـديـث ') . ' | ' . ($page_title ?? 'الصفحة الرئيسية') }}
+        {{$meta_title ?? null ? $meta_title .' | '. ($settings['site_name'] ?? config('app.name', 'أفضل معلم دهانات وديكورات جدة')) : $settings['site_name'] ?? config('app.name', ' أفضل معلم دهانات وديكورات في جدة ') .' | '. ($page_title ?? 'الصفحة الرئيسية')}}
     </title>
     @if (!empty($meta_description ?? null))
     <meta name="description" content="{{ $meta_description }}">
@@ -21,7 +21,8 @@
     <meta name="theme-color" content="#0A192F">
 
     {{-- ===== Canonical (مهم جدًا للسيو) ===== --}}
-    <link rel="canonical" href="{{ url()->current() }}">
+    <!--<link rel="canonical" href="{{ url()->current() }}">-->
+    <link rel="canonical" href="{{ url()->full() }}">
 
     <meta name="google-site-verification" content="_lMgioCLkmTGQmIVOxTCzpYviw6IC71fpk3xgCBxvXU" />
 
