@@ -27,13 +27,18 @@ class AppServiceProvider extends ServiceProvider
 
         try {
             // تخزين الإعدادات في الكاش لمدة يوم واحد (86400 ثانية)
+            // استخدام تذكر للأبد إذا لم تتغير الإعدادات كثيراً، أو زيادة الوقت
             $settings = Cache::remember('site_settings', 86400, function () {
-                return \App\Models\Setting::all()->pluck('value', 'key');
+                // التأكد من استرجاع البيانات كمصفوفة مفتاح => قيمة
+                return \App\Models\Setting::pluck('value', 'key')->toArray();
             });
 
+            // مشاركة المتغير مع جميع الـ Views
             view()->share('settings', $settings);
         } catch (\Exception $e) {
-            // معالجة الخطأ بصمت عند التثبيت لأول مرة
+            // معالجة الخطأ بصمت عند التثبيت لأول مرة أو مشاكل الاتصال بقاعدة البيانات
+            // يمكن تسجيل الخطأ هنا للمساعدة في التصحيح
+            // \Log::error('Settings loading error: ' . $e->getMessage());
         }
     }
 }

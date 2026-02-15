@@ -1,81 +1,168 @@
 @php
 /*
 |--------------------------------------------------------------------------
-| بيانات أساسية مشتركة
+| بيانات أساسية مشتركة (Global Data)
 |--------------------------------------------------------------------------
 */
 $logo = isset($settings['site_logo']) && $settings['site_logo']
 ? asset('storage/' . $settings['site_logo'])
 : asset('assets/img/logo.png');
 
-$phone = $settings['phone'] ?? '+966532791522';
+$phone = $settings['phone'] ?? null;
+$siteName = $settings['site_name'] ?? config('app.name');
+$siteUrl = url('/');
+$siteDescription = $meta_description ?? ($settings['site_description'] ?? '');
 
+// 1. Organization Schema
 $organization = [
-"@type" => "HomeAndConstructionBusiness",
-"@id" => url('/').'#organization',
-"name" => $settings['site_name'] ?? 'معلم دهانات وديكورات جدة',
-"url" => url('/'),
-"logo" => $logo,
+"@type" => "HomeAndConstructionBusiness", // نوع محدد لنشاط المقاولات والدهانات
+"@id" => $siteUrl.'/#organization',
+"name" => $siteName,
+"url" => $siteUrl,
+"logo" => [
+"@type" => "ImageObject",
+"url" => $logo,
+"width" => 512, // أبعاد افتراضية للشعار
+"height" => 512
+],
 "image" => $logo,
-"description" => $settings['meta_description'] ?? 'معلم دهانات وديكورات جدة لتنفيذ جميع أعمال الدهانات والديكورات الحديثة',
-"telephone" => $phone,
-"priceRange" => "SAR",
-"address" => [
+"description" => $siteDescription,
+];
+
+if ($phone) {
+$organization["telephone"] = $phone;
+}
+
+if (!empty($settings['email'])) {
+$organization["email"] = $settings['email'];
+}
+
+$organization["priceRange"] = "SAR"; // العملة
+
+// Address
+if (!empty($settings['address'])) {
+$organization["address"] = [
 "@type" => "PostalAddress",
-"streetAddress" => $settings['address'] ?? 'جدة حي الروضة',
+"streetAddress" => $settings['address'],
 "addressLocality" => 'جدة',
 "addressRegion" => 'مكة المكرمة',
 "addressCountry" => 'SA',
-],
-"geo" => [
+];
+}
+
+// Geo
+// Always expose GeoCoordinates even if lat/lng are missing (defaults will be used)
+$organization["geo"] = [
 "@type" => "GeoCoordinates",
-"latitude" => isset($settings['latitude']) ? (float)$settings['latitude'] : 21.567355,
-"longitude" => isset($settings['longitude']) ? (float)$settings['longitude'] : 39.1925,
-],
-"openingHoursSpecification" => [
+"latitude" => isset($settings['latitude']) && $settings['latitude'] !== '' ? (float)$settings['latitude'] : 21.567355,
+"longitude" => isset($settings['longitude']) && $settings['longitude'] !== '' ? (float)$settings['longitude'] : 39.1925
+];
+
+// Opening Hours
+if (!empty($settings['opens']) && !empty($settings['closes'])) {
+$organization["openingHoursSpecification"] = [
 [
 "@type" => "OpeningHoursSpecification",
 "dayOfWeek" => ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],
-"opens" => $settings['opens'] ?? "07:00",
-"closes" => $settings['closes'] ?? "22:00",
+"opens" => $settings['opens'],
+"closes" => $settings['closes'],
 ]
-],
-"sameAs" => array_values(array_filter([
+];
+}
+
+// SameAs
+$socials = array_values(array_filter([
 $settings['whatsapp'] ?? null,
 $settings['facebook'] ?? null,
 $settings['instagram'] ?? null,
-])),
-"contactPoint" => [
+$settings['twitter'] ?? null,
+$settings['youtube'] ?? null,
+$settings['tiktok'] ?? null,
+$settings['snapchat'] ?? null,
+$settings['linkedin'] ?? null,
+]));
+
+if (!empty($socials)) {
+$organization["sameAs"] = $socials;
+}
+
+// Contact Point
+if ($phone) {
+$organization["contactPoint"] = [
 [
 "@type" => "ContactPoint",
 "telephone" => $phone,
 "contactType" => "customer service",
-"areaServed" => $settings['addressLocality'] ?? "SA",
+"areaServed" => "Jeddah",
 "availableLanguage" => ["Arabic"]
 ]
-]
 ];
+}
 
 /*
 |--------------------------------------------------------------------------
-| نبدأ بناء الـ schema العام
+| تهيئة المخطط (Schema Initialization)
 |--------------------------------------------------------------------------
 */
 $schema = [
 "@context" => "https://schema.org",
+"@graph" => []
 ];
 
+// دالة مساعدة لإضافة العناصر إلى المخطط
+$addToGraph = function($item) use (&$schema) {
+$schema['@graph'][] = $item;
+};
+
+// إضافة المؤسسة كعنصر أساسي في كل الصفحات
+$addToGraph($organization);
+
+// 2. BreadcrumbList Schema (مسار التنقل - يضاف ديناميكياً)
+$breadcrumbs = [
+[
+"@type" => "ListItem",
+"position" => 1,
+"name" => "الرئيسية",
+"item" => route('home')
+]
+];
+
+$addBreadcrumb = function($name, $url) use (&$breadcrumbs) {
+$breadcrumbs[] = [
+"@type" => "ListItem",
+"position" => count($breadcrumbs) + 1,
+"name" => $name,
+"item" => $url
+];
+};
 
 /*
 |--------------------------------------------------------------------------
-| 1) الصفحة الرئيسية
-| شرط يعتمد على اسم الراوت أو على مسار الجذر كاحتياط
+| منطق الصفحات (Page Logic)
 |--------------------------------------------------------------------------
 */
+
+// --- الصفحة الرئيسية (Home) ---
 if (request()->routeIs('home') || request()->is('/')) {
-// إضافة التقييمات (Reviews) إذا وجدت
+
+// WebSite Schema (مهم لتعريف الموقع لمحركات البحث)
+$website = [
+"@type" => "WebSite",
+"@id" => $siteUrl.'/#website',
+"url" => $siteUrl,
+"name" => $siteName,
+"description" => $siteDescription,
+"publisher" => [
+"@id" => $siteUrl.'/#organization'
+],
+"inLanguage" => "ar-SA"
+];
+$addToGraph($website);
+
+// Reviews & AggregateRating (التقييمات)
 if (isset($testimonials) && count($testimonials) > 0) {
 $reviews = [];
+$totalRating = 0;
 foreach ($testimonials as $t) {
 $reviews[] = [
 "@type" => "Review",
@@ -83,6 +170,7 @@ $reviews[] = [
 "@type" => "Person",
 "name" => $t->client_name
 ],
+"datePublished" => $t->created_at->format('Y-m-d'),
 "reviewRating" => [
 "@type" => "Rating",
 "ratingValue" => $t->rating,
@@ -90,280 +178,224 @@ $reviews[] = [
 ],
 "reviewBody" => strip_tags($t->content)
 ];
+$totalRating += $t->rating;
 }
-$organization['review'] = $reviews;
 
-// حساب AggregateRating
-$avgRating = 0;
-$count = count($testimonials);
-foreach ($testimonials as $t) {
-$avgRating += $t->rating;
-}
-if ($count > 0) {
-$organization['aggregateRating'] = [
+$avgRating = count($testimonials) > 0 ? $totalRating / count($testimonials) : 5;
+
+// تحديث عنصر المؤسسة في المخطط لإضافة التقييمات
+// بما أن المؤسسة هي العنصر الأول (index 0)
+$schema['@graph'][0]['aggregateRating'] = [
 "@type" => "AggregateRating",
-"ratingValue" => number_format($avgRating / $count, 1),
-"reviewCount" => $count
+"ratingValue" => number_format($avgRating, 1),
+"reviewCount" => count($testimonials)
 ];
+$schema['@graph'][0]['review'] = $reviews;
 }
 }
 
-$schema['@graph'] = [$organization];
-}
+// --- صفحة الخدمات (Services List) ---
+elseif (request()->routeIs('services.index')) {
+$addBreadcrumb($settings['services_meta_title'] ?? "الخدمات", route('services.index'));
 
-/*
-|--------------------------------------------------------------------------
-| 2) صفحة عرض جميع الخدمات (Services list)
-| نتعامل مع الحالات: $services قد تكون Paginator أو Collection أو Array
-|--------------------------------------------------------------------------
-*/
-elseif (request()->routeIs('services.index') || (isset($services) && count($services) > 0 && !isset($service))) {
-// نجمع عنصر Service لكل خدمة لإدراجها ضمن hasPart
-$servicesSchema = [];
-$position = 1;
-
-// استخدم اسم محلي مختلف داخل الحلقة لتجنب تعارض $service في الـ view
+$servicesList = [];
+if (isset($services)) {
+$pos = 1;
 foreach ($services as $svc) {
-// حماية: تأكد من وجود الخصائص الأساسية
-if (is_object($svc) && isset($svc->title) && (isset($svc->slug) || isset($svc->id))) {
-$slugOrId = isset($svc->slug) ? $svc->slug : (isset($svc->id) ? $svc->id : null);
-$servicesSchema[] = [
+if (is_object($svc) && isset($svc->title)) {
+$url = isset($svc->slug) ? route('services.show', $svc->slug) : url('/services/' . $svc->id);
+$servicesList[] = [
 "@type" => "Service",
 "name" => $svc->title,
-"url" => isset($svc->slug) ? route('services.show', $svc->slug) : url('/services/' . $slugOrId),
-"position" => $position++
+"url" => $url,
+"position" => $pos++
 ];
 }
 }
+}
 
-$schema['@graph'] = [
-$organization,
-[
+$addToGraph([
 "@type" => "CollectionPage",
-"name" => $settings['services_page_title'] ?? "جميع خدمات الدهانات والديكورات",
+"name" => ($settings['services_meta_title'] ?? "خدماتنا") . ' - ' . $siteName,
 "url" => url()->current(),
-"hasPart" => $servicesSchema
-]
-];
+"description" => $settings['services_meta_description'] ?? "تصفح جميع خدمات الدهانات والديكورات التي نقدمها في جدة",
+"hasPart" => $servicesList
+]);
 }
 
-/*
-|--------------------------------------------------------------------------
-| 3) صفحة خدمة فردية (Service show)
-| يعتمد على راوت services.show أو وجود المتغير $service ككائن
-|--------------------------------------------------------------------------
-*/
-elseif (request()->routeIs('services.show') || (isset($service) && is_object($service))) {
-// تأكد أن $service كائن صالح
-if (!isset($service) || !is_object($service)) {
-// إذا لم يكن $service صالحًا، فقط أطبع المؤسسة لتجنب خطأ
-$schema['@graph'] = [$organization];
-} else {
-$schema['@graph'] = [
-$organization,
-[
+// --- صفحة خدمة فردية (Service Detail) ---
+elseif (request()->routeIs('services.show') && isset($service) && is_object($service)) {
+$addBreadcrumb($settings['services_meta_title'] ?? "الخدمات", route('services.index'));
+$addBreadcrumb($service->title, url()->current());
+
+$addToGraph([
 "@type" => "Service",
-"name" => $service->title,
+"name" => ($service->meta_title ?: $service->title) . ' - ' . $siteName,
 "url" => url()->current(),
-"description" => $service->meta_description ?? (isset($service->description) ? strip_tags($service->description) : $organization['description']),
-"provider" => [
-"@type" => "HomeAndConstructionBusiness",
-"@id" => $organization['@id'],
-"name" => $organization['name'],
-],
+"description" => $service->meta_description ?: Str::limit(strip_tags($service->description ?? ''), 160),
+"provider" => ["@id" => $siteUrl.'/#organization'],
 "image" => !empty($service->image_path) ? asset('storage/' . $service->image_path) : $logo,
-]
-];
-}
-}
-
-/*
-|--------------------------------------------------------------------------
-| 4) صفحة عرض جميع المشاريع (Projects list)
-| راوت مفترض: projects.index
-| نتعامل مع $projects كـ Collection / Paginator / Array
-|--------------------------------------------------------------------------
-*/
-elseif (request()->routeIs('projects.index') || (isset($projects) && count($projects) > 0 && !isset($project))) {
-$projectsSchema = [];
-$position = 1;
-
-foreach ($projects as $prj) {
-if (is_object($prj) && isset($prj->title) && (isset($prj->slug) || isset($prj->id))) {
-$slugOrId = isset($prj->slug) ? $prj->slug : (isset($prj->id) ? $prj->id : null);
-$projectsSchema[] = [
-"@type" => "CreativeWork", // نستخدم CreativeWork للمشاريع
-"name" => $prj->title,
-"url" => isset($prj->slug) ? route('projects.show', $prj->slug) : url('/projects/' . $slugOrId),
-"position" => $position++
-];
-}
-}
-
-$schema['@graph'] = [
-$organization,
-[
-"@type" => "CollectionPage",
-"name" => $settings['projects_page_title'] ?? "جميع المشاريع",
-"url" => url()->current(),
-"hasPart" => $projectsSchema
-]
-];
-}
-
-/*
-|--------------------------------------------------------------------------
-| 5) صفحة مشروع فردي (Project show)
-| راوت مفترض: projects.show
-|--------------------------------------------------------------------------
-*/
-elseif (request()->routeIs('projects.show') || (isset($project) && is_object($project))) {
-if (!isset($project) || !is_object($project)) {
-$schema['@graph'] = [$organization];
-} else {
-$projectImage = !empty($project->image_path) ? asset('storage/' . $project->image_path) : $logo;
-$schema['@graph'] = [
-$organization,
-[
-"@type" => "CreativeWork",
-"name" => $project->title,
-"url" => url()->current(),
-"description" => $project->meta_description ?? (isset($project->description) ? strip_tags($project->description) : $organization['description']),
-"creator" => [
-"@type" => $organization['@type'],
-"@id" => $organization['@id'],
-"name" => $organization['name']
+"areaServed" => [
+"@type" => "City",
+"name" => "Jeddah",
+"sameAs" => "https://en.wikipedia.org/wiki/Jeddah"
 ],
-"image" => $projectImage
-]
+"serviceType" => "Home Improvement"
+]);
+}
+
+// --- صفحة المشاريع (Projects List) ---
+elseif (request()->routeIs('projects.index')) {
+$addBreadcrumb($settings['projects_meta_title'] ?? "المشاريع", route('projects.index'));
+
+$projectsList = [];
+if (isset($projects)) {
+$pos = 1;
+foreach ($projects as $prj) {
+if (is_object($prj) && isset($prj->title)) {
+$url = isset($prj->slug) ? route('projects.show', $prj->slug) : url('/projects/' . $prj->id);
+$projectsList[] = [
+"@type" => "CreativeWork",
+"name" => $prj->title,
+"url" => $url,
+"position" => $pos++
 ];
 }
 }
+}
 
-/*
-|--------------------------------------------------------------------------
-| 7) صفحة المدونة (قائمة المقالات)
-|--------------------------------------------------------------------------
-*/
-elseif (request()->routeIs('blog.index') || (isset($posts) && count($posts) > 0 && !isset($post))) {
-$blogSchema = [];
-$position = 1;
+$addToGraph([
+"@type" => "CollectionPage",
+"name" => ($settings['projects_meta_title'] ?? "مشاريعنا") . ' - ' . $siteName,
+"url" => url()->current(),
+"description" => $settings['projects_meta_description'] ?? "معرض أعمالنا ومشاريعنا السابقة في الدهانات والديكور",
+"hasPart" => $projectsList
+]);
+}
 
+// --- صفحة مشروع فردي (Project Detail) ---
+elseif (request()->routeIs('projects.show') && isset($project) && is_object($project)) {
+$addBreadcrumb($settings['projects_meta_title'] ?? "المشاريع", route('projects.index'));
+$addBreadcrumb($project->title, url()->current());
+
+$addToGraph([
+"@type" => "CreativeWork",
+"name" => ($project->meta_title ?: $project->title) . ' - ' . $siteName,
+"url" => url()->current(),
+"description" => $project->meta_description ?: Str::limit(strip_tags($project->description ?? ''), 160),
+"creator" => ["@id" => $siteUrl.'/#organization'],
+"image" => !empty($project->main_image) ? asset('storage/' . $project->main_image) : $logo,
+"dateCreated" => $project->created_at->toIso8601String(),
+"locationCreated" => [
+"@type" => "Place",
+"name" => "Jeddah"
+]
+]);
+}
+
+// --- المدونة (Blog List) ---
+elseif (request()->routeIs('blog.index')) {
+$addBreadcrumb($settings['blog_meta_title'] ?? "المدونة", route('blog.index'));
+
+$blogList = [];
+if (isset($posts)) {
 foreach ($posts as $p) {
-if (is_object($p) && isset($p->title)) {
-$blogSchema[] = [
+$blogList[] = [
 "@type" => "BlogPosting",
 "headline" => $p->title,
 "url" => route('blog.show', $p->slug ?? $p->id),
-"datePublished" => $p->published_at ? $p->published_at->toIso8601String() : $p->created_at->toIso8601String(),
-"image" => !empty($p->image_path) ? asset('storage/' . $p->image_path) : $logo,
-"position" => $position++
+"datePublished" => $p->published_at ? $p->published_at->toIso8601String() : $p->created_at->toIso8601String()
 ];
 }
 }
 
-$schema['@graph'] = [
-$organization,
-[
+$addToGraph([
 "@type" => "Blog",
-"name" => $settings['blog_page_title'] ?? "المدونة",
+"name" => ($settings['blog_meta_title'] ?? "المدونة") . ' - ' . $siteName,
 "url" => url()->current(),
-"blogPost" => $blogSchema
-]
-];
+"description" => $settings['blog_meta_description'] ?? "اقرأ أحدث المقالات والنصائح في مجال المقاولات والبناء",
+"blogPost" => $blogList
+]);
 }
 
-/*
-|--------------------------------------------------------------------------
-| 8) صفحة مقال فردي (Blog Post)
-|--------------------------------------------------------------------------
-*/
-elseif (request()->routeIs('blog.show') || (isset($post) && is_object($post))) {
-if (!isset($post) || !is_object($post)) {
-$schema['@graph'] = [$organization];
-} else {
-$postImage = !empty($post->image_path) ? asset('storage/' . $post->image_path) : $logo;
-$schema['@graph'] = [
-$organization,
-[
+// --- مقال فردي (Blog Post) ---
+elseif (request()->routeIs('blog.show') && isset($post) && is_object($post)) {
+$addBreadcrumb($settings['blog_meta_title'] ?? "المدونة", route('blog.index'));
+$addBreadcrumb($post->title, url()->current());
+
+$addToGraph([
 "@type" => "BlogPosting",
-"headline" => $post->title,
+"headline" => ($post->meta_title ?: $post->title) . ' - ' . $siteName,
 "url" => url()->current(),
 "datePublished" => $post->published_at ? $post->published_at->toIso8601String() : $post->created_at->toIso8601String(),
 "dateModified" => $post->updated_at->toIso8601String(),
-"image" => $postImage,
-"author" => [
-"@type" => "Organization",
-"name" => $organization['name']
-],
-"publisher" => [
-"@type" => "Organization",
-"name" => $organization['name'],
-"logo" => [
-"@type" => "ImageObject",
-"url" => $organization['logo']
+"image" => !empty($post->image_path) ? asset('storage/' . $post->image_path) : $logo,
+"author" => ["@id" => $siteUrl.'/#organization'],
+"publisher" => ["@id" => $siteUrl.'/#organization'],
+"description" => $post->meta_description ?: Str::limit(strip_tags($post->content ?? ''), 160),
+"articleBody" => strip_tags($post->content ?? ''),
+"mainEntityOfPage" => [
+"@type" => "WebPage",
+"@id" => url()->current()
 ]
-],
-"description" => $post->meta_description ?? Str::limit(strip_tags($post->content ?? ''), 160),
-"articleBody" => strip_tags($post->content ?? '')
+]);
+
+// FAQ Schema
+if ($post->faqs && $post->faqs->count() > 0) {
+$faqItems = [];
+foreach ($post->faqs as $faq) {
+$faqItems[] = [
+"@type" => "Question",
+"name" => $faq->question,
+"acceptedAnswer" => [
+"@type" => "Answer",
+"text" => $faq->answer
 ]
 ];
 }
+
+$addToGraph([
+"@type" => "FAQPage",
+"mainEntity" => $faqItems
+]);
+}
 }
 
-/*
-|--------------------------------------------------------------------------
-| 9) صفحة من نحن (About)
-|--------------------------------------------------------------------------
-*/
+// --- صفحات ثابتة (Static Pages) ---
 elseif (request()->routeIs('about')) {
-$schema['@graph'] = [
-$organization,
-[
+$addBreadcrumb($settings['about_meta_title'] ?? "من نحن", route('about'));
+$addToGraph([
 "@type" => "AboutPage",
-"name" => "من نحن - " . ($settings['site_name'] ?? 'الفن الحديث'),
+"name" => ($settings['about_meta_title'] ?? "من نحن") . ' - ' . $siteName,
 "url" => url()->current(),
-"description" => $settings['site_description'] ?? 'معلم دهانات وديكورات جدة لتنفيذ جميع أعمال الدهانات والديكورات الحديثة',
-"mainEntity" => [
-"@id" => $organization['@id']
-]
-]
-];
+"description" => $settings['about_meta_description'] ?? "تعرف على أفضل معلم دهانات وديكورات في جدة",
+"mainEntity" => ["@id" => $siteUrl.'/#organization']
+]);
 }
-
-/*
-|--------------------------------------------------------------------------
-| 10) صفحة اتصل بنا (Contact)
-|--------------------------------------------------------------------------
-*/
 elseif (request()->routeIs('contact')) {
-$schema['@graph'] = [
-$organization,
-[
+$addBreadcrumb($settings['contact_meta_title'] ?? "اتصل بنا", route('contact'));
+$addToGraph([
 "@type" => "ContactPage",
-"name" => "اتصل بنا - " . ($settings['site_name'] ?? 'الفن الحديث'),
+"name" => ($settings['contact_meta_title'] ?? "اتصل بنا") . ' - ' . $siteName,
 "url" => url()->current(),
+"description" => $settings['contact_meta_description'] ?? "تواصل معنا لطلب خدمات الدهانات والديكور",
 "mainEntity" => [
 "@type" => "ContactPoint",
 "telephone" => $phone,
-"contactType" => "customer service",
-"areaServed" => "SA",
-"availableLanguage" => "Arabic"
+"contactType" => "customer service"
 ]
-]
-];
+]);
 }
 
-/*
-|--------------------------------------------------------------------------
-| 11) صفحات عادية / افتراضية
-|--------------------------------------------------------------------------
-*/
-else {
-$schema['@graph'] = [$organization];
+// 3. إضافة BreadcrumbList إلى المخطط النهائي
+if (count($breadcrumbs) > 1) {
+$addToGraph([
+"@type" => "BreadcrumbList",
+"itemListElement" => $breadcrumbs
+]);
 }
 @endphp
 
 <script type="application/ld+json">
-{!! json_encode($schema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) !!}
+    {!!json_encode($schema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) !!}
 </script>

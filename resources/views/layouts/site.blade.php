@@ -5,9 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-
+<!--         {{$meta_title ?? null ? $meta_title .' | '. ($settings['site_name'] ?? config('app.name', 'أفضل معلم دهانات وديكورات جدة')) : $settings['site_name'] ?? config('app.name', ' أفضل معلم دهانات وديكورات في جدة ') .' | '. ($page_title ?? 'الصفحة الرئيسية')}} -->
     <title>
-        {{$meta_title ?? null ? $meta_title .' | '. ($settings['site_name'] ?? config('app.name', 'أفضل معلم دهانات وديكورات جدة')) : $settings['site_name'] ?? config('app.name', ' أفضل معلم دهانات وديكورات في جدة ') .' | '. ($page_title ?? 'الصفحة الرئيسية')}}
+        {{$meta_title ?? null ? $meta_title .' | '. ($settings['site_name'] ?? config('app.name')) : ($settings['site_name'] ?? config('app.name')) .' | '. ($page_title ?? 'الصفحة الرئيسية')}}
     </title>
     @if (!empty($meta_description ?? null))
     <meta name="description" content="{{Str::limit(strip_tags($meta_description ?? ''), 160)}}"> {{-- تأكد من أن الوصف لا يتجاوز 160 حرفًا --}}
@@ -27,7 +27,7 @@
 
     <meta name="google-site-verification" content="_lMgioCLkmTGQmIVOxTCzpYviw6IC71fpk3xgCBxvXU" />
 
-    <meta property="og:title" content="{{ $meta_title ?? ($settings['site_name'] ?? 'معلم دهانات وديكورات جدة ت: 0532791522') }}">
+    <meta property="og:title" content="{{ $meta_title ?? ($settings['site_name'] ?? config('app.name')) }}">
 
 
     @if (!empty($meta_description ?? null))

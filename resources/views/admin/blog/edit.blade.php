@@ -13,12 +13,12 @@
         <form action="{{ route('admin.blog.update', $blog->id) }}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
-            
+
             <div class="mb-3">
                 <label class="form-label" for="title">عنوان المقال</label>
                 <input class="form-control @error('title') is-invalid @enderror" id="title" type="text" name="title" value="{{ old('title', $blog->title) }}" required>
                 @error('title')
-                    <div class="invalid-feedback">{{ $message }}</div>
+                <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
             </div>
 
@@ -26,7 +26,7 @@
                 <label class="form-label" for="content">المحتوى</label>
                 <textarea class="rich-text form-control" id="content" name="content" rows="10" required>{{ old('content', $blog->content) }}</textarea>
                 @error('content')
-                    <div class="text-danger small">{{ $message }}</div>
+                <div class="text-danger small">{{ $message }}</div>
                 @enderror
             </div>
 
@@ -34,7 +34,7 @@
                 <label class="form-label" for="slug">السلاج (عنوان الرابط)</label>
                 <input class="form-control @error('slug') is-invalid @enderror" id="slug" type="text" name="slug" value="{{ old('slug', $blog->slug) }}" placeholder="مثال: blog-post-title">
                 @error('slug')
-                    <div class="invalid-feedback">{{ $message }}</div>
+                <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
                 <small class="text-muted d-block mt-1">اتركه فارغاً ليتم توليده تلقائياً من العنوان.</small>
             </div>
@@ -42,9 +42,9 @@
             <div class="mb-3">
                 <label class="form-label" for="image">صورة المقال (اتركها فارغة للإبقاء على الصورة الحالية)</label>
                 @if($blog->image_path)
-                    <div class="mb-2">
-                        <img src="{{ asset('storage/' . $blog->image_path) }}" alt="{{ $blog->title }}" class="rounded border" style="height:128px;width:128px;object-fit:cover">
-                    </div>
+                <div class="mb-2">
+                    <img src="{{ asset('storage/' . $blog->image_path) }}" alt="{{ $blog->title }}" class="rounded border" style="height:128px;width:128px;object-fit:cover">
+                </div>
                 @endif
                 <input class="form-control" id="image" type="file" name="image">
             </div>
@@ -77,6 +77,39 @@
                 <small class="text-muted d-block mt-1">وصف مختصر يظهر في نتائج البحث.</small>
             </div>
 
+            <hr class="my-3">
+            <h3 class="h6 fw-bold mb-3">الأسئلة الشائعة (FAQ Schema)</h3>
+            <input type="hidden" name="faqs_submit_indicator" value="1">
+            <div id="faqs-container">
+                @php
+                $faqs = old('faqs', $blog->faqs);
+                @endphp
+                @foreach($faqs as $index => $faq)
+                @php
+                // Normalize data (handle both array from old() and object from Model)
+                $question = is_array($faq) ? ($faq['question'] ?? '') : $faq->question;
+                $answer = is_array($faq) ? ($faq['answer'] ?? '') : $faq->answer;
+                @endphp
+                <div class="card mb-3 faq-item">
+                    <div class="card-body bg-light">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="fw-bold">سؤال {{ $index + 1 }}</span>
+                            <button type="button" class="btn btn-sm btn-danger remove-faq">حذف</button>
+                        </div>
+                        <div class="mb-2">
+                            <input type="text" name="faqs[{{ $index }}][question]" class="form-control" placeholder="السؤال" value="{{ $question }}">
+                        </div>
+                        <div>
+                            <textarea name="faqs[{{ $index }}][answer]" class="form-control" placeholder="الإجابة" rows="2">{{ $answer }}</textarea>
+                        </div>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+            <button type="button" class="btn btn-sm btn-success mb-3" id="add-faq">
+                <i class="fas fa-plus"></i> إضافة سؤال جديد
+            </button>
+
             <div class="text-end">
                 <button class="btn btn-primary" type="submit">تحديث المقال</button>
             </div>
@@ -87,4 +120,37 @@
 @push('styles')
 @endpush
 @push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        let faqIndex={{is_array(old('faqs')) ? count(old('faqs')) : $blog->faqs->count()}};
+
+        document.getElementById('add-faq').addEventListener('click', function() {
+            const container = document.getElementById('faqs-container');
+            const template = `
+                <div class="card mb-3 faq-item">
+                    <div class="card-body bg-light">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="fw-bold">سؤال جديد</span>
+                            <button type="button" class="btn btn-sm btn-danger remove-faq">حذف</button>
+                        </div>
+                        <div class="mb-2">
+                            <input type="text" name="faqs[${faqIndex}][question]" class="form-control" placeholder="السؤال">
+                        </div>
+                        <div>
+                            <textarea name="faqs[${faqIndex}][answer]" class="form-control" placeholder="الإجابة" rows="2"></textarea>
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', template);
+            faqIndex++;
+        });
+
+        document.getElementById('faqs-container').addEventListener('click', function(e) {
+            if (e.target.classList.contains('remove-faq')) {
+                e.target.closest('.faq-item').remove();
+            }
+        });
+    });
+</script>
 @endpush

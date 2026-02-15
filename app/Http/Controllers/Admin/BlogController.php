@@ -36,12 +36,15 @@ class BlogController extends Controller
             'published_at' => 'nullable|date',
             'meta_title' => 'nullable|string|max:255',
             'meta_description' => 'nullable|string',
+            'faqs' => 'nullable|array',
+            'faqs.*.question' => 'nullable|string',
+            'faqs.*.answer' => 'nullable|string',
         ]);
 
-        $data = $request->except('image');
+        $data = $request->except(['image', 'faqs']);
 
         if ($request->hasFile('image')) {
-              // عمل سلاج مؤقت لتسمية الصورة بحسب العنوان
+            // عمل سلاج مؤقت لتسمية الصورة بحسب العنوان
             $tempslug = Str::slug($request->title);
             $manager = new ImageManager(new Driver());
             $image = $manager->read($request->file('image'));
@@ -58,13 +61,27 @@ class BlogController extends Controller
 
         $data['active'] = $request->has('active') ? $request->active : 1;
 
-        BlogPost::create($data);
+        $post = BlogPost::create($data);
+
+        // Handle FAQs
+        if ($request->has('faqs')) {
+            foreach ($request->faqs as $faq) {
+                if (!empty($faq['question']) && !empty($faq['answer'])) {
+                    $post->faqs()->create([
+                        'question' => $faq['question'],
+                        'answer' => $faq['answer'],
+                        'active' => true
+                    ]);
+                }
+            }
+        }
 
         return redirect()->route('admin.blog.index')->with('success', 'تم إضافة المقال بنجاح');
     }
 
     public function edit(BlogPost $blog)
     {
+        $blog->load('faqs');
         return view('admin.blog.edit', compact('blog'));
     }
 
@@ -79,15 +96,18 @@ class BlogController extends Controller
             'published_at' => 'nullable|date',
             'meta_title' => 'nullable|string|max:255',
             'meta_description' => 'nullable|string',
+            'faqs' => 'nullable|array',
+            'faqs.*.question' => 'nullable|string',
+            'faqs.*.answer' => 'nullable|string',
         ]);
 
-        $data = $request->except('image');
+        $data = $request->except(['image', 'faqs']);
 
         if ($request->hasFile('image')) {
             if ($blog->image_path) {
                 Storage::disk('public')->delete($blog->image_path);
             }
-              // عمل سلاج مؤقت لتسمية الصورة بحسب العنوان
+            // عمل سلاج مؤقت لتسمية الصورة بحسب العنوان
             $tempslug = Str::slug($request->title);
             $manager = new ImageManager(new Driver());
             $image = $manager->read($request->file('image'));
@@ -105,6 +125,23 @@ class BlogController extends Controller
         $data['active'] = $request->has('active') ? 1 : 0;
 
         $blog->update($data);
+
+        // Handle FAQs
+        if ($request->has('faqs')) {
+            $blog->faqs()->delete(); // Reset FAQs
+            foreach ($request->faqs as $faq) {
+                if (!empty($faq['question']) && !empty($faq['answer'])) {
+                    $blog->faqs()->create([
+                        'question' => $faq['question'],
+                        'answer' => $faq['answer'],
+                        'active' => true
+                    ]);
+                }
+            }
+        } elseif ($request->exists('faqs_submit_indicator')) {
+            // If the indicator exists but faqs array is empty, it means user deleted all FAQs
+            $blog->faqs()->delete();
+        }
 
         return redirect()->route('admin.blog.index')->with('success', 'تم تحديث المقال بنجاح');
     }

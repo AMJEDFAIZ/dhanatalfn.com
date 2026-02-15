@@ -179,7 +179,7 @@ class GenerateSitemap extends Command
                 'default_priority' => 1.0,
                 'default_freq' => 'daily',
                 'title' => $settings['site_name'] ?? config('app.name'), // Use site_name as home title usually
-                'description' => $settings['site_description'] ?? 'أفضل معلم دهانات وديكورات في جدة',
+                'description' => $settings['site_description'] ?? '',
             ],
             'about' => [
                 'route' => 'about',
@@ -199,7 +199,7 @@ class GenerateSitemap extends Command
                 'default_priority' => 0.8,
                 'default_freq' => 'monthly',
                 'title' => $settings['contact_meta_title'] ?? ('اتصل بنا | ' . $siteName),
-                'description' => $settings['contact_meta_description'] ?? 'تواصل معنا لطلب خدمات الدهانات والديكور',
+                'description' => $settings['contact_meta_description'] ?? '',
             ],
             'services.index' => [
                 'route' => 'services.index',
@@ -207,7 +207,7 @@ class GenerateSitemap extends Command
                 'default_priority' => 0.9,
                 'default_freq' => 'weekly',
                 'title' => $settings['services_meta_title'] ?? ('خدماتنا | ' . $siteName),
-                'description' => $settings['services_meta_description'] ?? 'استعرض جميع خدمات الدهانات والديكورات التي نقدمها',
+                'description' => $settings['services_meta_description'] ?? '',
             ],
             'projects.index' => [
                 'route' => 'projects.index',

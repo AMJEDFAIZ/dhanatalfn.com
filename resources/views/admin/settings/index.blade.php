@@ -34,6 +34,25 @@
                 <input type="text" name="address" id="address" value="{{ $settings['address'] ?? '' }}" class="form-control">
             </div>
             <div class="col-12">
+                <h5 class="mt-3">الموقع وأوقات العمل (Schema)</h5>
+            </div>
+            <div class="col-12 col-md-6">
+                <label for="latitude" class="form-label">خط العرض (Latitude)</label>
+                <input type="text" name="latitude" id="latitude" value="{{ $settings['latitude'] ?? '' }}" class="form-control" placeholder="مثال: 21.567355">
+            </div>
+            <div class="col-12 col-md-6">
+                <label for="longitude" class="form-label">خط الطول (Longitude)</label>
+                <input type="text" name="longitude" id="longitude" value="{{ $settings['longitude'] ?? '' }}" class="form-control" placeholder="مثال: 39.1925">
+            </div>
+            <div class="col-12 col-md-6">
+                <label for="opens" class="form-label">وقت الفتح</label>
+                <input type="time" name="opens" id="opens" value="{{ $settings['opens'] ?? '' }}" class="form-control">
+            </div>
+            <div class="col-12 col-md-6">
+                <label for="closes" class="form-label">وقت الإغلاق</label>
+                <input type="time" name="closes" id="closes" value="{{ $settings['closes'] ?? '' }}" class="form-control">
+            </div>
+            <div class="col-12">
                 <h5 class="mt-3">تواصل اجتماعي</h5>
             </div>
             <div class="col-12 col-md-6 col-lg-3">
@@ -55,6 +74,18 @@
             <div class="col-12 col-md-6 col-lg-3">
                 <label for="whatsapp" class="form-label">WhatsApp (Number)</label>
                 <input type="text" name="whatsapp" id="whatsapp" value="{{ $settings['whatsapp'] ?? '' }}" class="form-control" placeholder="9665XXXXXXXX">
+            </div>
+            <div class="col-12 col-md-6 col-lg-3">
+                <label for="youtube" class="form-label">Youtube</label>
+                <input type="url" name="youtube" id="youtube" value="{{ $settings['youtube'] ?? '' }}" class="form-control">
+            </div>
+            <div class="col-12 col-md-6 col-lg-3">
+                <label for="tiktok" class="form-label">TikTok</label>
+                <input type="url" name="tiktok" id="tiktok" value="{{ $settings['tiktok'] ?? '' }}" class="form-control">
+            </div>
+            <div class="col-12 col-md-6 col-lg-3">
+                <label for="snapchat" class="form-label">Snapchat</label>
+                <input type="url" name="snapchat" id="snapchat" value="{{ $settings['snapchat'] ?? '' }}" class="form-control">
             </div>
             <div class="col-12">
                 <h5 class="mt-3">الشعارات</h5>
