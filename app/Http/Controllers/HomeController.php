@@ -9,7 +9,6 @@ use App\Models\Service;
 use App\Models\Setting;
 use App\Models\Skill;
 use App\Models\Testimonial;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\ContactAdminMail;
@@ -142,7 +141,7 @@ class HomeController extends Controller
             'معلم ديكور',
             'فني ديكور',
             'فني ديكورات جدة',
-        ])->filter()->unique()->implode(', ');
+        ])->filter()->unique()->shuffle()->random(7)->implode(', ');
 
 
         return view('about', compact('skills', 'settings', 'meta_title', 'meta_description', 'meta_keywords', 'totalprojects'));
@@ -152,7 +151,7 @@ class HomeController extends Controller
     {
         $settings = Setting::all()->pluck('value', 'key');
         // $meta_title = 'تواصل معنا';
-         // $meta_description = $settings['site_description'] ?? null;
+        // $meta_description = $settings['site_description'] ?? null;
         // $meta_description = Str::limit(strip_tags($settings['site_description'] ?? null), 160) ?? 'أفضل معلم دهانات وديكورات في جدة (حي الروضة). خدمات دهانات داخلية وخارجية، ديكور جبس، بديل خشب ورخام، ورق جدران، تشطيبات شاملة. جودة عالية وسعر منافس.';
         $meta_title = $settings['contact_meta_title'] ?? config('app.name', 'من نحن');
         $meta_description = Setting::where('key', 'contact_meta_description')->value('value') ?? 'تصفح أحدث مشاريعنا المنفذة بجودة واحترافية.';
@@ -249,12 +248,12 @@ class HomeController extends Controller
             'الجزيرة',
             'دهانات داخية',
             'الجزيرة دهانات'
-        ])->filter()->unique()->shuffle()->implode(', ');
+        ])->filter()->unique()->shuffle(7)->implode(', ');
 
         return view('contact', compact('settings', 'meta_title', 'meta_description', 'meta_keywords'));
     }
 
-    public function submit(Request $request): JsonResponse
+    public function submit(Request $request)
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:100'],
@@ -262,6 +261,7 @@ class HomeController extends Controller
             'phone' => ['nullable', 'string', 'max:30'],
             'subject' => ['required', 'string', 'max:50'],
             'message' => ['required', 'string', 'max:500'],
+            'website' => ['nullable', 'string', 'max:0'],
         ]);
         $adminEmail = Setting::where('key', 'email')->value('value') ?? config('mail.from.address');
         try {
@@ -292,18 +292,26 @@ class HomeController extends Controller
             Mail::to($message->email)
                 ->queue(new ContactAutoReplyMail($data));
 
-            return response()->json([
-                'status' => 'ok'
-            ]);
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'status' => 'ok',
+                ]);
+            }
+
+            return redirect()->back()->with('success', 'تم إرسال رسالتك بنجاح');
         } catch (\Throwable $e) {
 
             // تسجيل الخطأ
             Log::error($e);
 
-            return response()->json([
-                'status' => 'error',
-                'message' => 'حدث خطأ أثناء إرسال الرسالة'
-            ], 500);
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'حدث خطأ أثناء إرسال الرسالة',
+                ], 500);
+            }
+
+            return redirect()->back()->withInput()->with('error', 'حدث خطأ أثناء إرسال الرسالة');
         }
     }
 }

@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-<!--         {{$meta_title ?? null ? $meta_title .' | '. ($settings['site_name'] ?? config('app.name', 'أفضل معلم دهانات وديكورات جدة')) : $settings['site_name'] ?? config('app.name', ' أفضل معلم دهانات وديكورات في جدة ') .' | '. ($page_title ?? 'الصفحة الرئيسية')}} -->
+    {{-- <!--         {{$meta_title ?? null ? $meta_title .' | '. ($settings['site_name'] ?? config('app.name', 'أفضل معلم دهانات وديكورات جدة')) : $settings['site_name'] ?? config('app.name', ' أفضل معلم دهانات وديكورات في جدة ') .' | '. ($page_title ?? 'الصفحة الرئيسية')}} --> --}}
     <title>
         {{$meta_title ?? null ? $meta_title .' | '. ($settings['site_name'] ?? config('app.name')) : ($settings['site_name'] ?? config('app.name')) .' | '. ($page_title ?? 'الصفحة الرئيسية')}}
     </title>
@@ -16,14 +16,28 @@
     <meta name="keywords" content="{{ is_array($meta_keywords) ? implode(', ', $meta_keywords) : $meta_keywords }}">
     @endif
 
+    @php
+    $canonicalUrl = url()->current();
+    $query = request()->query();
+    $canonicalParams = array_intersect_key($query, array_flip(['page']));
+    if (!empty($canonicalParams) && count($canonicalParams) === count($query)) {
+    $canonicalUrl = url()->current() . '?' . http_build_query($canonicalParams);
+    }
+
+    $robotsContent = 'index,follow, max-snippet:-1, max-video-preview:-1, max-image-preview:large';
+    if (request()->routeIs('blog.index') && request()->filled('search')) {
+    $robotsContent = 'noindex, follow, max-snippet:-1, max-video-preview:-1, max-image-preview:large';
+    }
+    @endphp
+
     <meta name="author" content="{{ 'معلم دهانات وديكورات جدة ت: 0532791522' ?? $settings['site_name']  }}">
     {{-- <meta name="robots" content="index, follow"> --}}
-    <meta name="robots" content="follow, index, max-snippet:-1, max-video-preview:-1, max-image-preview:large">
+    <meta name="robots" content="{{ $robotsContent }}">
     <meta name="theme-color" content="#0A192F">
 
     {{-- ===== Canonical (مهم جدًا للسيو) ===== --}}
     {{-- <!--<link rel="canonical" href="{{ url()->current() }}">--> --}}
-    <link rel="canonical" href="{{ url()->full() }}">
+    <link rel="canonical" href="{{ $canonicalUrl }}">
 
     <meta name="google-site-verification" content="_lMgioCLkmTGQmIVOxTCzpYviw6IC71fpk3xgCBxvXU" />
 
@@ -35,7 +49,7 @@
     @endif
 
 
-    <meta property="og:url" content="{{ config('app.url') . request()->getPathInfo() }}">
+    <meta property="og:url" content="{{ $canonicalUrl }}">
     <meta property="og:type" content="website">
 
     @if (isset($settings['site_logo']))
@@ -57,10 +71,8 @@
     <meta name="twitter:image" content="{{ asset('storage/' . $settings['site_logo']) }}">
     @endif
 
-    @if (isset($settings['site_favicon']))
-    <link rel="icon"
+    <link rel="icon" type="image/x-icon"
         href="{{ isset($settings['site_favicon']) ? asset('storage/' . $settings['site_favicon']) : asset('assets/img/favicon.ico') }}">
-    @endif
 
 
     {{-- ===== Apple (iPhone) ===== --}}

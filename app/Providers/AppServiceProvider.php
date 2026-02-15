@@ -35,6 +35,18 @@ class AppServiceProvider extends ServiceProvider
 
             // مشاركة المتغير مع جميع الـ Views
             view()->share('settings', $settings);
+
+            view()->composer('admin.layouts.admin', function ($view) {
+                try {
+                    $unreadMessagesCount = Cache::remember('admin_unread_messages_count', 60, function () {
+                        return \App\Models\Message::where('is_read', false)->count();
+                    });
+                } catch (\Throwable) {
+                    $unreadMessagesCount = 0;
+                }
+
+                $view->with('unreadMessagesCount', $unreadMessagesCount);
+            });
         } catch (\Exception $e) {
             // معالجة الخطأ بصمت عند التثبيت لأول مرة أو مشاكل الاتصال بقاعدة البيانات
             // يمكن تسجيل الخطأ هنا للمساعدة في التصحيح

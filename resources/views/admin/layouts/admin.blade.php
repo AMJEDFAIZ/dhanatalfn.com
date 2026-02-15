@@ -7,8 +7,8 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', $settings['site_name'] ?? 'لوحة الإدارة') - إدارة</title>
     @if (isset($settings['site_favicon']))
-        <link rel="icon" href="{{ asset('storage/' . $settings['site_favicon']) ?? asset('assets/img/favicon.ico') }}"
-            type="image/x-icon">
+    <link rel="icon" href="{{ asset('storage/' . $settings['site_favicon']) ?? asset('assets/img/favicon.ico') }}"
+        type="image/x-icon">
     @endif
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
@@ -132,25 +132,24 @@
             </a>
             <ul class="navbar-nav ms-auto align-items-center">
                 <li class="nav-item dropdown me-2">
-                    @php $unreadMessages = \App\Models\Message::where('is_read', false)->count(); @endphp
                     <a class="nav-link dropdown-toggle position-relative" href="#" role="button"
                         data-bs-toggle="dropdown" aria-expanded="false">
                         <i class="bi bi-bell"></i>
-                        @if ($unreadMessages > 0)
-                            <span
-                                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">{{ $unreadMessages }}</span>
+                        @if (($unreadMessagesCount ?? 0) > 0)
+                        <span
+                            class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">{{ $unreadMessagesCount }}</span>
                         @endif
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end">
                         <li>
                             <h6 class="dropdown-header">الإشعارات</h6>
                         </li>
-                        @if ($unreadMessages > 0)
-                            <li><a class="dropdown-item d-flex justify-content-between align-items-center"
-                                    href="{{ route('admin.messages.index', ['status' => 'unread']) }}">رسائل غير
-                                    مقروءة<span class="badge bg-danger ms-2">{{ $unreadMessages }}</span></a></li>
+                        @if (($unreadMessagesCount ?? 0) > 0)
+                        <li><a class="dropdown-item d-flex justify-content-between align-items-center"
+                                href="{{ route('admin.messages.index', ['status' => 'unread']) }}">رسائل غير
+                                مقروءة<span class="badge bg-danger ms-2">{{ $unreadMessagesCount }}</span></a></li>
                         @else
-                            <li><a class="dropdown-item" href="#">لا توجد إشعارات جديدة</a></li>
+                        <li><a class="dropdown-item" href="#">لا توجد إشعارات جديدة</a></li>
                         @endif
                     </ul>
                 </li>

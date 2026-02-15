@@ -32,21 +32,11 @@
     RewriteCond %{REQUEST_URI} !^/public/
 
     #####################################################
-    # 2) إذا كان الملف أو المجلد موجودًا فعليًا
-    #    لا نعيد توجيهه
-    #####################################################
-
-    RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteCond %{REQUEST_FILENAME} !-f
-
-    #####################################################
     # 3) إعادة توجيه كل شيء إلى مجلد public
     #####################################################
 
-    RewriteRule ^(.*)$ /public/$1
-
-    # توجيه الصفحة الرئيسية إلى public/index.php
-    RewriteRule ^(/)?$ public/index.php [L]
+    RewriteRule ^$ public/index.php [L]
+    RewriteRule ^(.*)$ public/$1 [L]
 
 </IfModule>
 
@@ -55,8 +45,13 @@
 #########################################################
 
 <FilesMatch "^(\.env|composer\.(json|lock)|package\.json|artisan|\.git|README\.md)">
-    Order allow,deny
-    Deny from all
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
 </FilesMatch>
 
 #########################################################
@@ -64,5 +59,3 @@
 #########################################################
 
 Options -Indexes
-
-Options All

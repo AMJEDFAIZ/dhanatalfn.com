@@ -10,4 +10,3 @@ Artisan::command('inspire', function () {
 
 
 Schedule::command('sitemap:generate')->daily();
-Schedule::command('queue:work')->daily();

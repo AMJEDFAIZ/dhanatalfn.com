@@ -36,7 +36,7 @@ class ServiceController extends Controller
             'title' => 'required|string|max:255',
             'slug' => ['nullable', 'string', 'max:255', 'alpha_dash', Rule::unique('services', 'slug')],
             'description' => 'nullable|string',
-            'icon' => 'nullable|string|max:255',
+            'icon' => ['nullable', 'string', 'max:255', 'regex:/^fa-[a-z0-9-]+$/i'],
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'active' => 'boolean',
             'sort_order' => 'integer',
@@ -106,7 +106,7 @@ class ServiceController extends Controller
                 Rule::unique('services', 'slug')->ignore($service->id)
             ],
             'description' => 'nullable|string',
-            'icon' => 'nullable|string|max:255',
+            'icon' => ['nullable', 'string', 'max:255', 'regex:/^fa-[a-z0-9-]+$/i'],
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'active' => 'boolean',
             'sort_order' => 'integer',

@@ -8,7 +8,7 @@ use App\Traits\HasSlug;
 class Service extends Model
 {
     use HasSlug;
-   
+
     protected $fillable = [
         'title',
         'slug',
@@ -29,5 +29,20 @@ class Service extends Model
     public function projects()
     {
         return $this->hasMany(Project::class, 'service_id');
+    }
+
+    public function iconClass(): ?string
+    {
+        if (!is_string($this->icon) || $this->icon === '') {
+            return null;
+        }
+
+        $icon = trim($this->icon);
+
+        if (!preg_match('/^fa-[a-z0-9-]+$/i', $icon)) {
+            return null;
+        }
+
+        return strtolower($icon);
     }
 }

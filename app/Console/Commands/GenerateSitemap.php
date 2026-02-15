@@ -125,15 +125,6 @@ class GenerateSitemap extends Command
                 $xml .= '    <priority>' . $url['priority'] . '</priority>' . PHP_EOL;
             }
 
-            // Custom Tags (Requested by user)
-            if ($url['title']) {
-                $xml .= '    <title>' . htmlspecialchars(\Illuminate\Support\Str::limit($url['title'], 150)) . '</title>' . PHP_EOL;
-            }
-
-            if ($url['description']) {
-                $xml .= '    <description>' . htmlspecialchars(\Illuminate\Support\Str::limit($url['description'], 300)) . '</description>' . PHP_EOL;
-            }
-
             // Images
             foreach ($url['images'] as $img) {
                 $xml .= '    <image:image>' . PHP_EOL;

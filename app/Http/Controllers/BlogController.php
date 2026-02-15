@@ -10,12 +10,23 @@ class BlogController extends Controller
 {
     public function index()
     {
-        $posts = BlogPost::where('active', true)->orderBy('published_at', 'desc')->paginate(9);
+        $search = request()->string('search')->trim()->toString();
+
+        $postsQuery = BlogPost::where('active', true)->orderBy('published_at', 'desc');
+
+        if ($search !== '') {
+            $postsQuery->where(function ($q) use ($search) {
+                $q->where('title', 'like', '%' . $search . '%')
+                    ->orWhere('content', 'like', '%' . $search . '%');
+            });
+        }
+
+        $posts = $postsQuery->paginate(9)->withQueryString();
         $meta_title = Setting::where('key', 'blog_meta_title')->value('value') ?? 'المدونة';
         $meta_description = Setting::where('key', 'blog_meta_description')->value('value') ?? 'اقرأ أحدث المقالات والنصائح في مجال المقاولات والبناء.';
         $meta_keywords = collect($posts->pluck('title')->take(10))->implode(', ');
 
-        return view('blog.index', compact('posts', 'meta_title', 'meta_description', 'meta_keywords'));
+        return view('blog.index', compact('posts', 'meta_title', 'meta_description', 'meta_keywords', 'search'));
     }
 
     public function show($slug)

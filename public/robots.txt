@@ -4,7 +4,8 @@ Disallow:
 # Prevent access to system files and sensitive pages
 Disallow: /config/
 Disallow: /vendor/
-Disallow: /admin/login
+Disallow: /admin/
+Disallow: /database/
 
 # Allow access to public files
 Allow: /assets/
