@@ -5,6 +5,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ServiceController;
+use App\Http\Controllers\KeywordController;
 use Illuminate\Support\Facades\Route;
 
 // Public Routes
@@ -20,6 +21,7 @@ Route::get('/projects', [ProjectController::class, 'index'])->name('projects.ind
 Route::get('/projects/{slug}', [ProjectController::class, 'show'])->name('projects.show');
 Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
 Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
+Route::get('/keywords/{keyword:slug}', [KeywordController::class, 'show'])->name('keywords.show');
 
 // Admin Routes
 Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(function () {
@@ -31,6 +33,10 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     Route::resource('blog', App\Http\Controllers\Admin\BlogController::class)->scoped(['blog' => 'id']);
     Route::resource('testimonials', App\Http\Controllers\Admin\TestimonialController::class);
     Route::resource('skills', App\Http\Controllers\Admin\SkillController::class);
+    Route::resource('keywords', App\Http\Controllers\Admin\KeywordController::class);
+    Route::get('seo-pages', [App\Http\Controllers\Admin\SeoPageController::class, 'index'])->name('seo-pages.index');
+    Route::get('seo-pages/{seoPage}/edit', [App\Http\Controllers\Admin\SeoPageController::class, 'edit'])->name('seo-pages.edit');
+    Route::put('seo-pages/{seoPage}', [App\Http\Controllers\Admin\SeoPageController::class, 'update'])->name('seo-pages.update');
 
     Route::get('settings', [App\Http\Controllers\Admin\SettingController::class, 'index'])->name('settings.index');
     Route::put('settings', [App\Http\Controllers\Admin\SettingController::class, 'update'])->name('settings.update');

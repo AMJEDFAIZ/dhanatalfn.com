@@ -206,6 +206,12 @@
                     <a href="{{ route('admin.blog.index') }}"
                         class="list-group-item {{ request()->routeIs('admin.blog.*') ? 'active' : '' }}"><i
                             class="bi bi-journal-text ms-2"></i> المدونة</a>
+                    <a href="{{ route('admin.keywords.index') }}"
+                        class="list-group-item {{ request()->routeIs('admin.keywords.*') ? 'active' : '' }}"><i
+                            class="bi bi-tags ms-2"></i> الكلمات المفتاحية</a>
+                    <a href="{{ route('admin.seo-pages.index') }}"
+                        class="list-group-item {{ request()->routeIs('admin.seo-pages.*') ? 'active' : '' }}"><i
+                            class="bi bi-globe2 ms-2"></i> كلمات الصفحات</a>
                     <a href="{{ route('admin.testimonials.index') }}"
                         class="list-group-item {{ request()->routeIs('admin.testimonials.*') ? 'active' : '' }}"><i
                             class="bi bi-chat-quote ms-2"></i> آراء العملاء</a>
@@ -248,6 +254,12 @@
                     <a href="{{ route('admin.blog.index') }}"
                         class="list-group-item {{ request()->routeIs('admin.blog.*') ? 'active' : '' }}"><i
                             class="bi bi-journal-text ms-2"></i> المدونة</a>
+                    <a href="{{ route('admin.keywords.index') }}"
+                        class="list-group-item {{ request()->routeIs('admin.keywords.*') ? 'active' : '' }}"><i
+                            class="bi bi-tags ms-2"></i> الكلمات المفتاحية</a>
+                    <a href="{{ route('admin.seo-pages.index') }}"
+                        class="list-group-item {{ request()->routeIs('admin.seo-pages.*') ? 'active' : '' }}"><i
+                            class="bi bi-globe2 ms-2"></i> كلمات الصفحات</a>
                     <a href="{{ route('admin.testimonials.index') }}"
                         class="list-group-item {{ request()->routeIs('admin.testimonials.*') ? 'active' : '' }}"><i
                             class="bi bi-chat-quote ms-2"></i> آراء العملاء</a>

@@ -15,6 +15,8 @@ use App\Mail\ContactAdminMail;
 use App\Mail\ContactAutoReplyMail;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use App\Services\SeoMetaService;
+use App\Services\SeoPageService;
 
 class HomeController extends Controller
 {
@@ -31,46 +33,13 @@ class HomeController extends Controller
         // $meta_title = 'أفضل معلم دهانات وديكورات جدة';
         $meta_title = $settings['site_name'] ?? config('app.name', 'أفضل معلم دهانات وديكورات جدة');
         // $meta_description = $settings['site_description'] ?? null;
-        $meta_description = Str::limit(strip_tags($settings['site_description'] ?? null), 160) ?? 'أفضل معلم دهانات وديكورات في جدة (حي الروضة). خدمات دهانات داخلية وخارجية، ديكور جبس، بديل خشب ورخام، ورق جدران، تشطيبات شاملة. جودة عالية وسعر منافس.';
+        $meta_description = Str::limit(strip_tags($settings['site_description'] ?? ''), 160) ?: 'أفضل معلم دهانات وديكورات في جدة (حي الروضة). خدمات دهانات داخلية وخارجية، ديكور جبس، بديل خشب ورخام، ورق جدران، تشطيبات شاملة. جودة عالية وسعر منافس.';
 
-        $meta_keywords = collect([
-            $settings['site_name'] ?? null,
-            'أفضل معلم دهانات جدة',
-            'أفضل معلم دهانات بجدة',
-            'معلم دهانات جدة',
-            'معلم دهانات جده',
-            'معلم دهان جده',
-            'معلم دهان جدة',
-            'معلم دهان',
-            'معلم بويه جدة حي الروضة',
-            'معلم بوية',
-            'معلم بويات جدة',
-            'معلم بويه جدة الروضة',
-            'معلم بويا جدة',
-            'معلم بوية جدة',
-            'معلم دهان في جدة',
-            'معلم فوم جدة',
-            'معلم ديكور جدة',
-            'بديل الرخام',
-            'بديل الشيبورد',
-            'بديل خشب داخلي',
-            'الواح شيبورد',
-            'بديل الخشب',
-            'شيبورد ديكور',
-            'ورق جدران',
-            'دهان بويه',
-            'معلم بويه',
-            'بويه جوتن',
-            'بويه جدران',
-            'دهانات وديكورات جدة',
-            'ديكورات رمضان',
-            'بديل خشب خارجي',
-            'شيبورد خشب',
-            'بديل شيبورد',
-            'شيبورد',
-            'بديل رخام',
-        ])->filter()->unique()->implode(', ');
-        return view('home', compact('services', 'projects', 'testimonials', 'skills', 'latestPosts', 'meta_title', 'meta_description', 'meta_keywords', 'totalprojects'));
+        $seoPage = app(SeoPageService::class)->getByKey('home');
+        $meta_keywords = app(SeoMetaService::class)->keywordsString($seoPage?->keywordsForMeta() ?? []);
+        $pageContentKeywords = $seoPage?->contentKeywords()->where('keywords.active', true)->orderBy('keywords.name')->get() ?? collect();
+
+        return view('home', compact('services', 'projects', 'testimonials', 'skills', 'latestPosts', 'meta_title', 'meta_description', 'meta_keywords', 'totalprojects', 'pageContentKeywords'));
     }
 
     public function about()
@@ -81,70 +50,11 @@ class HomeController extends Controller
         $meta_title = $settings['about_meta_title'] ?? config('app.name', 'من نحن');
         $meta_description = Setting::where('key', 'about_meta_description')->value('value') ?? 'تصفح أحدث مشاريعنا المنفذة بجودة واحترافية.';
 
-        // $meta_description = Str::limit(strip_tags($settings['site_description'] ?? null), 160) ?? 'أفضل معلم دهانات وديكورات في جدة (حي الروضة). خدمات دهانات داخلية وخارجية، ديكور جبس، بديل خشب ورخام، ورق جدران، تشطيبات شاملة. جودة عالية وسعر منافس.';
-        $meta_keywords = collect([
-            $settings['site_name'] ?? null,
+        $seoPage = app(SeoPageService::class)->getByKey('about');
+        $meta_keywords = app(SeoMetaService::class)->keywordsString($seoPage?->keywordsForMeta() ?? []);
+        $pageContentKeywords = $seoPage?->contentKeywords()->where('keywords.active', true)->orderBy('keywords.name')->get() ?? collect();
 
-            'بديل الرخام',
-            'بديل الشيبورد',
-            'بديل خشب داخلي',
-            'الواح شيبورد',
-            'بديل الخشب',
-            'شيبورد ديكور',
-            'ورق جدران',
-            'دهان بويه',
-            'معلم بويه',
-            'بويه جوتن',
-            'بويه جدران',
-            'معلم دهانات وديكورات جدة',
-            'دهانات داخلية جدة',
-            'دهانات خارجية جدة',
-            'سعر دهانات جدة',
-            'أفضل معلم دهانات جدة',
-            'ديكورات ودهانات جدة',
-            'دهان جده',
-
-            'مقاول دهانات',
-            'مقاول بجدة',
-            'دهان واجهات',
-            'مقاول دهانات بجدة',
-            'مقاول جبس بورد',
-            'مقاول اصباغ',
-            'مقاول بناء جدة',
-            'مقاول ملاحق جده',
-            'مقاول بناء في جدة',
-            'افضل مقاول في جدة',
-            'معلم بناء جدة',
-            'مطلوب مقاول جبس بورد',
-            'مطلوب مقاول دهانات',
-            'افضل مقاول بناء في جدة',
-            'مقاول تشطيب في جدة',
-            'مقاولين دهانات',
-            'افضل مقاول بجدة',
-            'هدم عماير جده',
-            'مقاول في جدة ممتاز',
-            'مطلوب مقاولين دهانات',
-            'مقاول عام جدة',
-            'معلم دهانات جدة',
-            'معلم دهانات جده',
-            'معلم دهان جده',
-            'معلم دهان جدة',
-            'معلم دهان',
-            'معلم بويه',
-            'معلم بوية',
-            'معلم بويات جدة',
-            'معلم بويا جدة',
-            'معلم بوية جدة',
-            'ديكور بديل الرخام',
-            'ديكور بديل الخشب',
-            'ديكور مرايا',
-            'معلم ديكور',
-            'فني ديكور',
-            'فني ديكورات جدة',
-        ])->filter()->unique()->shuffle()->random(7)->implode(', ');
-
-
-        return view('about', compact('skills', 'settings', 'meta_title', 'meta_description', 'meta_keywords', 'totalprojects'));
+        return view('about', compact('skills', 'settings', 'meta_title', 'meta_description', 'meta_keywords', 'totalprojects', 'pageContentKeywords'));
     }
 
     public function contact()
@@ -153,104 +63,14 @@ class HomeController extends Controller
         // $meta_title = 'تواصل معنا';
         // $meta_description = $settings['site_description'] ?? null;
         // $meta_description = Str::limit(strip_tags($settings['site_description'] ?? null), 160) ?? 'أفضل معلم دهانات وديكورات في جدة (حي الروضة). خدمات دهانات داخلية وخارجية، ديكور جبس، بديل خشب ورخام، ورق جدران، تشطيبات شاملة. جودة عالية وسعر منافس.';
-        $meta_title = $settings['contact_meta_title'] ?? config('app.name', 'من نحن');
+        $meta_title = $settings['contact_meta_title'] ?? config('app.name', 'تواصل معنا');
         $meta_description = Setting::where('key', 'contact_meta_description')->value('value') ?? 'تصفح أحدث مشاريعنا المنفذة بجودة واحترافية.';
 
+        $seoPage = app(SeoPageService::class)->getByKey('contact');
+        $meta_keywords = app(SeoMetaService::class)->keywordsString($seoPage?->keywordsForMeta() ?? []);
+        $pageContentKeywords = $seoPage?->contentKeywords()->where('keywords.active', true)->orderBy('keywords.name')->get() ?? collect();
 
-        $meta_keywords = collect([
-            $settings['site_name'] ?? null,
-            'اتصل معلم دهانات جدة',
-            'اتصال معلم دهانات جدة',
-            'استفسار دهانات جدة',
-            'معلم دهانات الروضة',
-            'صباغ جدة',
-            'دهان جده',
-
-            'مقاول دهانات',
-            'مقاول بجدة',
-            'دهان واجهات',
-            'مقاول دهانات بجدة',
-            'مقاول جبس بورد',
-            'مقاول اصباغ',
-            'مقاول بناء جدة',
-            'مقاول ملاحق جده',
-            'مقاول بناء في جدة',
-            'افضل مقاول في جدة',
-            'معلم بناء جدة',
-            'مطلوب مقاول جبس بورد',
-            'مطلوب مقاول دهانات',
-            'افضل مقاول بناء في جدة',
-            'مقاول تشطيب في جدة',
-            'مقاولين دهانات',
-            'افضل مقاول بجدة',
-            'هدم عماير جده',
-            'مقاول في جدة ممتاز',
-            'مطلوب مقاولين دهانات',
-            'مقاول عام جدة',
-            'مقاول كسر رخام',
-            'مقاول عام',
-            'معلم دهانات جدة',
-            'معلم دهانات جده',
-            'معلم دهان جده',
-            'معلم دهان جدة',
-            'معلم دهان',
-            'معلم بويه',
-            'معلم بوية',
-            'معلم بويات جدة',
-            'معلم بويا جدة',
-            'معلم بوية جدة',
-            'معلم دهان في جدة',
-            'معلم فوم جدة',
-            'معلم ديكور جدة',
-            'دهانات وديكورات جدة',
-            'معلم دهانات وديكورات جدة',
-            'ديكور بديل الرخام',
-            'ديكور بديل الخشب',
-            'ديكور مرايا',
-            'معلم ديكور',
-            'فني ديكور',
-            'فني ديكورات جدة',
-            'الوان دهانات الحوائط بالصور',
-            'بوية الجزيرة',
-            'دهان جدة',
-            'دهان جده',
-            'ديكورات رمضان',
-            'بديل خشب خارجي',
-            'شيبورد خشب',
-            'بديل شيبورد',
-            'شيبورد',
-            'بديل رخام',
-            'بديل الرخام',
-            'بديل الشيبورد',
-            'بديل خشب داخلي',
-            'الواح شيبورد',
-            'بديل الخشب',
-            'شيبورد ديكور',
-            'ورق جدران',
-            'دهان بويه',
-            'بويه جوتن',
-            'بويه جدران',
-            'ديكور جبس اسقف',
-            'ديكور جبس بورد اسقف',
-            'جبسيات اسقف',
-            'دهان بروفايل خارجي',
-            'بروفايل خارجي',
-            'معلم جبس جدة',
-            'معلم جبس بجدة',
-            'ديكورات تلفزيون',
-            'معلم جبس بورد',
-            'جبس بورد اسقف',
-            'جوتن للدهانات',
-            'دهانات تكنو',
-            'دهانات الجزيرة',
-            'دهانات الجزيره',
-            'الجزيره',
-            'الجزيرة',
-            'دهانات داخية',
-            'الجزيرة دهانات'
-        ])->filter()->unique()->shuffle(7)->implode(', ');
-
-        return view('contact', compact('settings', 'meta_title', 'meta_description', 'meta_keywords'));
+        return view('contact', compact('settings', 'meta_title', 'meta_description', 'meta_keywords', 'pageContentKeywords'));
     }
 
     public function submit(Request $request)

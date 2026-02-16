@@ -71,6 +71,12 @@
                 <small class="text-muted d-block mt-1">وصف مختصر يظهر في نتائج البحث.</small>
             </div>
 
+            @include('admin.partials.keywords-fields', [
+            'keywords' => $keywords,
+            'metaKeywordIds' => [],
+            'contentKeywordIds' => [],
+            ])
+
             <hr class="my-3">
             <h3 class="h6 fw-bold mb-3">الأسئلة الشائعة (FAQ Schema)</h3>
             <div id="faqs-container">
@@ -120,7 +126,11 @@
             });
         }
 
-        let faqIndex = {{is_array(old('faqs')) ? count(old('faqs')) : 0}};
+        let faqIndex = {
+            {
+                is_array(old('faqs')) ? count(old('faqs')) : 0
+            }
+        };
 
         document.getElementById('add-faq').addEventListener('click', function() {
             const container = document.getElementById('faqs-container');

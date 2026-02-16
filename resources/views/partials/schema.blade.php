@@ -11,7 +11,7 @@ $logo = isset($settings['site_logo']) && $settings['site_logo']
 $phone = $settings['phone'] ?? null;
 $siteName = $settings['site_name'] ?? config('app.name');
 $siteUrl = url('/');
-$siteDescription = $meta_description ?? ($settings['site_description'] ?? '');
+$siteDescription = !empty($meta_description ?? null) ? $meta_description : ($settings['site_description'] ?? '');
 
 // 1. Organization Schema
 $organization = [
@@ -397,5 +397,7 @@ $addToGraph([
 @endphp
 
 <script type="application/ld+json">
-    {!!json_encode($schema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) !!}
+    {
+        !!json_encode($schema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) !!
+    }
 </script>

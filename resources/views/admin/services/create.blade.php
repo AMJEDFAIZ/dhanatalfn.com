@@ -14,12 +14,12 @@
     <div class="card p-3">
         <form action="{{ route('admin.services.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
-            
+
             <div class="mb-3">
                 <label class="form-label" for="title">عنوان الخدمة</label>
                 <input class="form-control @error('title') is-invalid @enderror" id="title" type="text" name="title" value="{{ old('title') }}" required>
                 @error('title')
-                    <div class="invalid-feedback">{{ $message }}</div>
+                <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
             </div>
 
@@ -37,7 +37,7 @@
                 <label class="form-label" for="slug">السلاج (عنوان الرابط)</label>
                 <input class="form-control @error('slug') is-invalid @enderror" id="slug" type="text" name="slug" value="{{ old('slug') }}" placeholder="مثال: service-title">
                 @error('slug')
-                    <div class="invalid-feedback">{{ $message }}</div>
+                <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
                 <small class="text-muted d-block mt-1">اتركه فارغاً ليتم توليده تلقائياً من العنوان.</small>
             </div>
@@ -64,16 +64,16 @@
                 <label class="form-label">المشاريع المرتبطة (اختياري)</label>
                 <div class="card p-2" style="max-height: 200px; overflow-y: auto;">
                     @if($projects->count() > 0)
-                        @foreach($projects as $project)
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="project_ids[]" value="{{ $project->id }}" id="project_{{ $project->id }}" {{ in_array($project->id, old('project_ids', [])) ? 'checked' : '' }}>
-                                <label class="form-check-label" for="project_{{ $project->id }}">
-                                    {{ $project->title }}
-                                </label>
-                            </div>
-                        @endforeach
+                    @foreach($projects as $project)
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="project_ids[]" value="{{ $project->id }}" id="project_{{ $project->id }}" {{ in_array($project->id, old('project_ids', [])) ? 'checked' : '' }}>
+                        <label class="form-check-label" for="project_{{ $project->id }}">
+                            {{ $project->title }}
+                        </label>
+                    </div>
+                    @endforeach
                     @else
-                        <p class="text-muted small mb-0">لا توجد مشاريع غير مرتبطة حالياً.</p>
+                    <p class="text-muted small mb-0">لا توجد مشاريع غير مرتبطة حالياً.</p>
                     @endif
                 </div>
                 <small class="text-muted">يمكنك اختيار مشاريع لربطها بهذه الخدمة مباشرة.</small>
@@ -93,6 +93,12 @@
                 <textarea class="form-control" id="meta_description" name="meta_description" rows="3">{{ old('meta_description') }}</textarea>
                 <small class="text-muted d-block mt-1">وصف مختصر يظهر في نتائج البحث.</small>
             </div>
+
+            @include('admin.partials.keywords-fields', [
+            'keywords' => $keywords,
+            'metaKeywordIds' => [],
+            'contentKeywordIds' => [],
+            ])
 
             <div class="text-end">
                 <button class="btn btn-primary" type="submit">حفظ الخدمة</button>

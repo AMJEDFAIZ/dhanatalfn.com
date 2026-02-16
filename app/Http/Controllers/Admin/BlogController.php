@@ -4,7 +4,10 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\BlogPost;
+use App\Models\Keyword;
+use App\Services\KeywordService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Str;
@@ -22,7 +25,8 @@ class BlogController extends Controller
 
     public function create()
     {
-        return view('admin.blog.create');
+        $keywords = Keyword::where('active', true)->orderBy('name')->get();
+        return view('admin.blog.create', compact('keywords'));
     }
 
     public function store(Request $request)
@@ -39,9 +43,15 @@ class BlogController extends Controller
             'faqs' => 'nullable|array',
             'faqs.*.question' => 'nullable|string',
             'faqs.*.answer' => 'nullable|string',
+            'meta_keyword_ids' => 'nullable|array',
+            'meta_keyword_ids.*' => 'integer|exists:keywords,id',
+            'meta_keyword_names' => 'nullable|string',
+            'content_keyword_ids' => 'nullable|array',
+            'content_keyword_ids.*' => 'integer|exists:keywords,id',
+            'content_keyword_names' => 'nullable|string',
         ]);
 
-        $data = $request->except(['image', 'faqs']);
+        $data = $request->except(['image', 'faqs', 'meta_keyword_ids', 'meta_keyword_names', 'content_keyword_ids', 'content_keyword_names']);
 
         if ($request->hasFile('image')) {
             // عمل سلاج مؤقت لتسمية الصورة بحسب العنوان
@@ -61,7 +71,28 @@ class BlogController extends Controller
 
         $data['active'] = $request->has('active') ? $request->active : 1;
 
+        $keywordService = app(KeywordService::class);
+        $userId = Auth::id();
+
         $post = BlogPost::create($data);
+
+        $metaIds = $keywordService->resolveIdsOrFail(
+            $request->input('meta_keyword_ids', []),
+            $request->input('meta_keyword_names'),
+            KeywordService::META_LIMIT,
+            'meta_keyword_ids',
+            'ar',
+            $userId
+        );
+        $contentIds = $keywordService->resolveIdsOrFail(
+            $request->input('content_keyword_ids', []),
+            $request->input('content_keyword_names'),
+            KeywordService::CONTENT_LIMIT,
+            'content_keyword_ids',
+            'ar',
+            $userId
+        );
+        $keywordService->syncContexts($post, $metaIds, $contentIds);
 
         // Handle FAQs
         if ($request->has('faqs')) {
@@ -82,7 +113,24 @@ class BlogController extends Controller
     public function edit(BlogPost $blog)
     {
         $blog->load('faqs');
-        return view('admin.blog.edit', compact('blog'));
+        $blog->load('keywords');
+        $keywords = Keyword::where('active', true)->orderBy('name')->get();
+
+        $metaKeywordIds = $blog->keywords
+            ->filter(fn($k) => in_array($k->pivot->context, ['meta', 'both'], true))
+            ->pluck('id')
+            ->map(fn($id) => (int) $id)
+            ->values()
+            ->all();
+
+        $contentKeywordIds = $blog->keywords
+            ->filter(fn($k) => in_array($k->pivot->context, ['content', 'both'], true))
+            ->pluck('id')
+            ->map(fn($id) => (int) $id)
+            ->values()
+            ->all();
+
+        return view('admin.blog.edit', compact('blog', 'keywords', 'metaKeywordIds', 'contentKeywordIds'));
     }
 
     public function update(Request $request, BlogPost $blog)
@@ -99,9 +147,15 @@ class BlogController extends Controller
             'faqs' => 'nullable|array',
             'faqs.*.question' => 'nullable|string',
             'faqs.*.answer' => 'nullable|string',
+            'meta_keyword_ids' => 'nullable|array',
+            'meta_keyword_ids.*' => 'integer|exists:keywords,id',
+            'meta_keyword_names' => 'nullable|string',
+            'content_keyword_ids' => 'nullable|array',
+            'content_keyword_ids.*' => 'integer|exists:keywords,id',
+            'content_keyword_names' => 'nullable|string',
         ]);
 
-        $data = $request->except(['image', 'faqs']);
+        $data = $request->except(['image', 'faqs', 'meta_keyword_ids', 'meta_keyword_names', 'content_keyword_ids', 'content_keyword_names']);
 
         if ($request->hasFile('image')) {
             if ($blog->image_path) {
@@ -125,6 +179,26 @@ class BlogController extends Controller
         $data['active'] = $request->has('active') ? 1 : 0;
 
         $blog->update($data);
+
+        $keywordService = app(KeywordService::class);
+        $userId = Auth::id();
+        $metaIds = $keywordService->resolveIdsOrFail(
+            $request->input('meta_keyword_ids', []),
+            $request->input('meta_keyword_names'),
+            KeywordService::META_LIMIT,
+            'meta_keyword_ids',
+            'ar',
+            $userId
+        );
+        $contentIds = $keywordService->resolveIdsOrFail(
+            $request->input('content_keyword_ids', []),
+            $request->input('content_keyword_names'),
+            KeywordService::CONTENT_LIMIT,
+            'content_keyword_ids',
+            'ar',
+            $userId
+        );
+        $keywordService->syncContexts($blog, $metaIds, $contentIds);
 
         // Handle FAQs
         if ($request->has('faqs')) {

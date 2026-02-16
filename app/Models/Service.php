@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Traits\HasSlug;
+use App\Traits\HasKeywords;
 
 class Service extends Model
 {
-    use HasSlug;
+    use HasSlug, HasKeywords;
 
     protected $fillable = [
         'title',

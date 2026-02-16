@@ -6,14 +6,39 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     {{-- <!--         {{$meta_title ?? null ? $meta_title .' | '. ($settings['site_name'] ?? config('app.name', 'أفضل معلم دهانات وديكورات جدة')) : $settings['site_name'] ?? config('app.name', ' أفضل معلم دهانات وديكورات في جدة ') .' | '. ($page_title ?? 'الصفحة الرئيسية')}} --> --}}
+    @php
+    $sectionTitle = trim($__env->yieldContent('title'));
+    $sectionMetaTitle = trim($__env->yieldContent('meta_title'));
+    $sectionMetaDescription = trim($__env->yieldContent('meta_description'));
+    $sectionMetaKeywords = trim($__env->yieldContent('meta_keywords'));
+
+    $resolvedMetaTitle = $meta_title ?? ($sectionMetaTitle !== '' ? $sectionMetaTitle : ($sectionTitle !== '' ? $sectionTitle : null));
+    $resolvedPageTitle = $page_title ?? ($sectionTitle !== '' ? $sectionTitle : null);
+
+    $resolvedMetaDescription = $meta_description ?? ($sectionMetaDescription !== '' ? $sectionMetaDescription : null);
+    $resolvedMetaDescription = !empty($resolvedMetaDescription) ? preg_replace('/\s+/u', ' ', strip_tags((string) $resolvedMetaDescription)) : null;
+
+    if (!empty($meta_keywords ?? null)) {
+    $resolvedMetaKeywords = is_array($meta_keywords) ? implode(', ', $meta_keywords) : (string) $meta_keywords;
+    } elseif ($sectionMetaKeywords !== '') {
+    $resolvedMetaKeywords = (string) $sectionMetaKeywords;
+    } else {
+    $resolvedMetaKeywords = null;
+    }
+    $resolvedMetaKeywords = !empty($resolvedMetaKeywords) ? preg_replace('/\s+/u', ' ', strip_tags((string) $resolvedMetaKeywords)) : null;
+
+    $meta_title = $resolvedMetaTitle;
+    $meta_description = $resolvedMetaDescription;
+    $meta_keywords = $resolvedMetaKeywords;
+    @endphp
     <title>
-        {{$meta_title ?? null ? $meta_title .' | '. ($settings['site_name'] ?? config('app.name')) : ($settings['site_name'] ?? config('app.name')) .' | '. ($page_title ?? 'الصفحة الرئيسية')}}
+        {{$resolvedMetaTitle ? $resolvedMetaTitle .' | '. ($settings['site_name'] ?? config('app.name')) : ($settings['site_name'] ?? config('app.name')) .' | '. ($resolvedPageTitle ?? 'الصفحة الرئيسية')}}
     </title>
-    @if (!empty($meta_description ?? null))
-    <meta name="description" content="{{Str::limit(strip_tags($meta_description ?? ''), 160)}}"> {{-- تأكد من أن الوصف لا يتجاوز 160 حرفًا --}}
+    @if (!empty($resolvedMetaDescription))
+    <meta name="description" content="{{ Str::limit($resolvedMetaDescription, 160) }}">
     @endif
-    @if (!empty($meta_keywords ?? null))
-    <meta name="keywords" content="{{ is_array($meta_keywords) ? implode(', ', $meta_keywords) : $meta_keywords }}">
+    @if (!empty($resolvedMetaKeywords))
+    <meta name="keywords" content="{{ $resolvedMetaKeywords }}">
     @endif
 
     @php
@@ -28,9 +53,12 @@
     if (request()->routeIs('blog.index') && request()->filled('search')) {
     $robotsContent = 'noindex, follow, max-snippet:-1, max-video-preview:-1, max-image-preview:large';
     }
+    if (!empty($robots_noindex ?? null)) {
+    $robotsContent = 'noindex, follow, max-snippet:-1, max-video-preview:-1, max-image-preview:large';
+    }
     @endphp
 
-    <meta name="author" content="{{ 'معلم دهانات وديكورات جدة ت: 0532791522' ?? $settings['site_name']  }}">
+    <meta name="author" content="{{ $settings['site_author'] ?? ($settings['site_name'] ?? 'معلم دهانات وديكورات جدة ت: 0532791522') }}">
     {{-- <meta name="robots" content="index, follow"> --}}
     <meta name="robots" content="{{ $robotsContent }}">
     <meta name="theme-color" content="#0A192F">
@@ -41,11 +69,11 @@
 
     <meta name="google-site-verification" content="_lMgioCLkmTGQmIVOxTCzpYviw6IC71fpk3xgCBxvXU" />
 
-    <meta property="og:title" content="{{ $meta_title ?? ($settings['site_name'] ?? config('app.name')) }}">
+    <meta property="og:title" content="{{ $resolvedMetaTitle ?? ($settings['site_name'] ?? config('app.name')) }}">
 
 
-    @if (!empty($meta_description ?? null))
-    <meta property="og:description" content="{{ $meta_description }}">
+    @if (!empty($resolvedMetaDescription))
+    <meta property="og:description" content="{{ Str::limit($resolvedMetaDescription, 160) }}">
     @endif
 
 
@@ -62,9 +90,9 @@
     <meta property="og:site_name" content="{{ $settings['site_name'] ?? config('app.name') }}">
     {{-- ===== Twitter Cards (ضروري لمنصة X) ===== --}}
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="{{ $meta_title ?? ($settings['site_name'] ?? config('app.name')) }}">
-    @if (!empty($meta_description ?? null))
-    <meta name="twitter:description" content="{{ $meta_description }}">
+    <meta name="twitter:title" content="{{ $resolvedMetaTitle ?? ($settings['site_name'] ?? config('app.name')) }}">
+    @if (!empty($resolvedMetaDescription))
+    <meta name="twitter:description" content="{{ Str::limit($resolvedMetaDescription, 160) }}">
     @endif
 
     @if (isset($settings['site_logo']))

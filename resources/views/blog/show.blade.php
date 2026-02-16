@@ -84,7 +84,7 @@
                     class="mt-12 pt-8 border-t border-gray-100 flex flex-col md:flex-row justify-between items-center gap-6">
 
                     <div class="flex gap-2 flex-wrap">
-
+                        @include('partials.keyword-tags', ['keywords' => $contentKeywords])
                     </div>
                     <div class="flex gap-4">
                         <span class="text-gray-500 font-bold ml-2">مشاركة:</span>

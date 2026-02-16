@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\BlogPost;
 use App\Models\Setting;
+use App\Services\SeoMetaService;
+use App\Services\SeoPageService;
 use Illuminate\Support\Str;
 
 class BlogController extends Controller
@@ -24,9 +26,11 @@ class BlogController extends Controller
         $posts = $postsQuery->paginate(9)->withQueryString();
         $meta_title = Setting::where('key', 'blog_meta_title')->value('value') ?? 'المدونة';
         $meta_description = Setting::where('key', 'blog_meta_description')->value('value') ?? 'اقرأ أحدث المقالات والنصائح في مجال المقاولات والبناء.';
-        $meta_keywords = collect($posts->pluck('title')->take(10))->implode(', ');
+        $seoPage = app(SeoPageService::class)->getByKey('blog_index');
+        $meta_keywords = app(SeoMetaService::class)->keywordsString($seoPage?->keywordsForMeta() ?? []);
+        $pageContentKeywords = $seoPage?->contentKeywords()->where('keywords.active', true)->orderBy('keywords.name')->get() ?? collect();
 
-        return view('blog.index', compact('posts', 'meta_title', 'meta_description', 'meta_keywords', 'search'));
+        return view('blog.index', compact('posts', 'meta_title', 'meta_description', 'meta_keywords', 'search', 'pageContentKeywords'));
     }
 
     public function show($slug)
@@ -63,8 +67,12 @@ class BlogController extends Controller
 
         $meta_title = $post->meta_title ?: $post->title;
         $meta_description = $post->meta_description ?: Str::limit(strip_tags($post->content ?? ''), 160);
-        $meta_keywords = $post->title;
+        $meta = app(SeoMetaService::class)->metaForModel($post, [
+            'fallback_keywords' => [$post->title],
+        ]);
+        $meta_keywords = $meta['meta_keywords'];
+        $contentKeywords = $post->contentKeywords()->where('keywords.active', true)->orderBy('keywords.name')->get();
 
-        return view('blog.show', compact('post', 'prevPost', 'nextPost', 'recentPosts', 'meta_title', 'meta_description', 'meta_keywords'));
+        return view('blog.show', compact('post', 'prevPost', 'nextPost', 'recentPosts', 'meta_title', 'meta_description', 'meta_keywords', 'contentKeywords'));
     }
 }

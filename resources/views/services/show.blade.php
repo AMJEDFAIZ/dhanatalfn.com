@@ -63,19 +63,7 @@
                         class="mt-12 pt-8 border-t border-gray-100 flex flex-col md:flex-row justify-between items-center gap-6">
 
                         <div class="flex gap-2 flex-wrap">
-                            {{-- <span class="text-gray-500 font-bold ml-2">الوسوم:</span> --}}
-                            {{-- إذا كان لديك علاقة tags، استخدم اللوب التالي. وإلا اترك الروابط ثابتة كمثال --}}
-                            {{-- @foreach ($post->tags as $tag) --}}
-                            {{-- <a href="#"
-                                class="bg-gray-100 hover:bg-accent hover:text-white px-3 py-1 rounded-full text-sm text-gray-600 transition-colors">
-                                {{ $post->category->name ?? 'عام' }}
-                            </a> --}}
-                            {{-- @endforeach --}}
-                            {{-- <a href="#"
-                                class="bg-gray-100 hover:bg-accent hover:text-white px-3 py-1 rounded-full text-sm text-gray-600 transition-colors">بناء</a>
-                            <a href="#"
-                                class="bg-gray-100 hover:bg-accent hover:text-white px-3 py-1 rounded-full text-sm text-gray-600 transition-colors">تكنولوجيا</a>
-                         --}}
+                            @include('partials.keyword-tags', ['keywords' => $contentKeywords])
                         </div>
                         <div class="flex gap-4">
                             <span class="text-gray-500 font-bold ml-2">مشاركة:</span>
@@ -124,7 +112,7 @@
                             @endforeach
                         </div>
                         <div class="mt-8">
-                              {{ $projects->links('partials.pagination') }}
+                            {{ $projects->links('partials.pagination') }}
                         </div>
                     </div>
                     @endif

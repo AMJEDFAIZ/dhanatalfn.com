@@ -46,6 +46,14 @@ collect([$settings['site_name'] ?? null, 'دهانات', 'ديكورات', 'ال
     </div>
 </section>
 
+@if (isset($pageContentKeywords))
+<section class="py-6 bg-gray-50">
+    <div class="container mx-auto px-4">
+        @include('partials.keyword-tags', ['keywords' => $pageContentKeywords])
+    </div>
+</section>
+@endif
+
 <!-- About Section -->
 <section id="about" class="py-20 bg-gray-50">
     <div class="container mx-auto px-4">
@@ -518,6 +526,20 @@ collect([$settings['site_name'] ?? null, 'دهانات', 'ديكورات', 'ال
                 class="inline-block border-2 border-primary text-primary hover:bg-primary hover:text-white font-bold py-3 px-8 rounded-full transition-all">عرض
                 كل المقالات</a>
         </div>
+        @if (isset($pageContentKeywords))
+        <section class="py-6 bg-gray-50">
+            <div>
+                <span class="text-accent font-bold uppercase tracking-wider block mb-2">
+                    كلمات مفتاحية
+
+                </span>
+
+            </div>
+            <div class="container mx-auto px-4">
+                @include('partials.keyword-tags', ['keywords' => $pageContentKeywords])
+            </div>
+        </section>
+        @endif
         @else
         <div class="text-center text-gray-500 py-8">
             <p>لا توجد مقالات متاحة حالياً.</p>

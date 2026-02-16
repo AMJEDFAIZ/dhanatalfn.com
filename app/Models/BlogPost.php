@@ -4,9 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use App\Traits\HasKeywords;
 
 class BlogPost extends Model
 {
+    use HasKeywords;
+
     protected $fillable = [
         'title',
         'slug',

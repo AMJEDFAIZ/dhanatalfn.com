@@ -26,6 +26,11 @@ collect([$settings['site_name'] ?? null, 'تواصل معنا', 'تواصل', '�
                 class="text-accent/4 transition-colors py-1 relative  after:absolute after:bottom-0 after:right-0 after:w-full after:h-0.5 after:bg-accent after:transition-all">تـواصـل
                 مـعـنـا</span>
         </nav>
+        @if (isset($pageContentKeywords))
+        <div class="mt-5 flex justify-center">
+            @include('partials.keyword-tags', ['keywords' => $pageContentKeywords])
+        </div>
+        @endif
     </div>
 </section>
 

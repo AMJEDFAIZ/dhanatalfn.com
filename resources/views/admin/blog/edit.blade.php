@@ -77,6 +77,12 @@
                 <small class="text-muted d-block mt-1">وصف مختصر يظهر في نتائج البحث.</small>
             </div>
 
+            @include('admin.partials.keywords-fields', [
+            'keywords' => $keywords,
+            'metaKeywordIds' => $metaKeywordIds,
+            'contentKeywordIds' => $contentKeywordIds,
+            ])
+
             <hr class="my-3">
             <h3 class="h6 fw-bold mb-3">الأسئلة الشائعة (FAQ Schema)</h3>
             <input type="hidden" name="faqs_submit_indicator" value="1">
@@ -122,7 +128,11 @@
 @push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        let faqIndex={{is_array(old('faqs')) ? count(old('faqs')) : $blog->faqs->count()}};
+        let faqIndex = {
+            {
+                is_array(old('faqs')) ? count(old('faqs')) : $blog - > faqs - > count()
+            }
+        };
 
         document.getElementById('add-faq').addEventListener('click', function() {
             const container = document.getElementById('faqs-container');

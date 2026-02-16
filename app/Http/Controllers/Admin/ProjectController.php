@@ -5,7 +5,10 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Project;
 use App\Models\Service;
+use App\Models\Keyword;
+use App\Services\KeywordService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
@@ -26,7 +29,8 @@ class ProjectController extends Controller
     public function create()
     {
         $services = Service::where('active', true)->orderBy('title')->get();
-        return view('admin.projects.create', compact('services'));
+        $keywords = Keyword::where('active', true)->orderBy('name')->get();
+        return view('admin.projects.create', compact('services', 'keywords'));
     }
 
     public function store(Request $request)
@@ -44,9 +48,15 @@ class ProjectController extends Controller
             'sort_order' => 'integer',
             'meta_title' => 'nullable|string|max:255',
             'meta_description' => 'nullable|string',
+            'meta_keyword_ids' => 'nullable|array',
+            'meta_keyword_ids.*' => 'integer|exists:keywords,id',
+            'meta_keyword_names' => 'nullable|string',
+            'content_keyword_ids' => 'nullable|array',
+            'content_keyword_ids.*' => 'integer|exists:keywords,id',
+            'content_keyword_names' => 'nullable|string',
         ]);
 
-        $data = $request->except('main_image');
+        $data = $request->except('main_image', 'meta_keyword_ids', 'meta_keyword_names', 'content_keyword_ids', 'content_keyword_names');
         $newImagePath = null;
 
 
@@ -74,8 +84,29 @@ class ProjectController extends Controller
         $data['sort_order'] = $request->sort_order ?? 0;
 
         try {
-            DB::transaction(function () use ($data) {
-                Project::create($data);
+            $keywordService = app(KeywordService::class);
+            $userId = Auth::id();
+
+            DB::transaction(function () use ($data, $request, $keywordService, $userId) {
+                $project = Project::create($data);
+
+                $metaIds = $keywordService->resolveIdsOrFail(
+                    $request->input('meta_keyword_ids', []),
+                    $request->input('meta_keyword_names'),
+                    KeywordService::META_LIMIT,
+                    'meta_keyword_ids',
+                    'ar',
+                    $userId
+                );
+                $contentIds = $keywordService->resolveIdsOrFail(
+                    $request->input('content_keyword_ids', []),
+                    $request->input('content_keyword_names'),
+                    KeywordService::CONTENT_LIMIT,
+                    'content_keyword_ids',
+                    'ar',
+                    $userId
+                );
+                $keywordService->syncContexts($project, $metaIds, $contentIds);
             });
         } catch (\Throwable $e) {
             if ($newImagePath) {
@@ -90,7 +121,24 @@ class ProjectController extends Controller
     public function edit(Project $project)
     {
         $services = Service::where('active', true)->orderBy('title')->get();
-        return view('admin.projects.edit', compact('project', 'services'));
+        $project->load('keywords');
+        $keywords = Keyword::where('active', true)->orderBy('name')->get();
+
+        $metaKeywordIds = $project->keywords
+            ->filter(fn($k) => in_array($k->pivot->context, ['meta', 'both'], true))
+            ->pluck('id')
+            ->map(fn($id) => (int) $id)
+            ->values()
+            ->all();
+
+        $contentKeywordIds = $project->keywords
+            ->filter(fn($k) => in_array($k->pivot->context, ['content', 'both'], true))
+            ->pluck('id')
+            ->map(fn($id) => (int) $id)
+            ->values()
+            ->all();
+
+        return view('admin.projects.edit', compact('project', 'services', 'keywords', 'metaKeywordIds', 'contentKeywordIds'));
     }
 
     public function update(Request $request, Project $project)
@@ -108,9 +156,15 @@ class ProjectController extends Controller
             'sort_order' => 'integer',
             'meta_title' => 'nullable|string|max:255',
             'meta_description' => 'nullable|string',
+            'meta_keyword_ids' => 'nullable|array',
+            'meta_keyword_ids.*' => 'integer|exists:keywords,id',
+            'meta_keyword_names' => 'nullable|string',
+            'content_keyword_ids' => 'nullable|array',
+            'content_keyword_ids.*' => 'integer|exists:keywords,id',
+            'content_keyword_names' => 'nullable|string',
         ]);
 
-        $data = $request->except('main_image');
+        $data = $request->except('main_image', 'meta_keyword_ids', 'meta_keyword_names', 'content_keyword_ids', 'content_keyword_names');
         $newImagePath = null;
         $oldImagePath = $project->main_image;
 
@@ -133,8 +187,29 @@ class ProjectController extends Controller
         $data['active'] = $request->has('active') ? 1 : 0;
 
         try {
-            DB::transaction(function () use ($project, $data) {
+            $keywordService = app(KeywordService::class);
+            $userId = Auth::id();
+
+            DB::transaction(function () use ($project, $data, $request, $keywordService, $userId) {
                 $project->update($data);
+
+                $metaIds = $keywordService->resolveIdsOrFail(
+                    $request->input('meta_keyword_ids', []),
+                    $request->input('meta_keyword_names'),
+                    KeywordService::META_LIMIT,
+                    'meta_keyword_ids',
+                    'ar',
+                    $userId
+                );
+                $contentIds = $keywordService->resolveIdsOrFail(
+                    $request->input('content_keyword_ids', []),
+                    $request->input('content_keyword_names'),
+                    KeywordService::CONTENT_LIMIT,
+                    'content_keyword_ids',
+                    'ar',
+                    $userId
+                );
+                $keywordService->syncContexts($project, $metaIds, $contentIds);
             });
         } catch (\Throwable $e) {
             if ($newImagePath) {

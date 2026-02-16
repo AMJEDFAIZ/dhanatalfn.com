@@ -39,6 +39,11 @@ collect([$settings['site_name'] ?? null, 'خدماتنا', 'خدمات', 'الخ
         @if (session('error'))
         <div class="mb-4 bg-red-100 text-red-700 p-4 rounded">{{ session('error') }}</div>
         @endif
+        @if (isset($pageContentKeywords))
+        <div class="mb-6">
+            @include('partials.keyword-tags', ['keywords' => $pageContentKeywords])
+        </div>
+        @endif
         @if ($services->count() > 0)
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 animate-fade-in-up md-10">
             @foreach ($services as $index => $service)

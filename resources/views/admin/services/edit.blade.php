@@ -13,12 +13,12 @@
         <form action="{{ route('admin.services.update', $service->id) }}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
-            
+
             <div class="mb-3">
                 <label class="form-label" for="title">عنوان الخدمة</label>
                 <input class="form-control @error('title') is-invalid @enderror" id="title" type="text" name="title" value="{{ old('title', $service->title) }}" required>
                 @error('title')
-                    <div class="invalid-feedback">{{ $message }}</div>
+                <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
             </div>
 
@@ -36,7 +36,7 @@
                 <label class="form-label" for="slug">السلاج (عنوان الرابط)</label>
                 <input class="form-control @error('slug') is-invalid @enderror" id="slug" type="text" name="slug" value="{{ old('slug', $service->slug) }}" placeholder="مثال: service-title">
                 @error('slug')
-                    <div class="invalid-feedback">{{ $message }}</div>
+                <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
                 <small class="text-muted d-block mt-1">اتركه فارغاً ليتم توليده تلقائياً من العنوان.</small>
             </div>
@@ -44,9 +44,9 @@
             <div class="mb-3">
                 <label class="form-label" for="image">صورة الخدمة (اتركها فارغة للإبقاء على الصورة الحالية)</label>
                 @if($service->image_path)
-                    <div class="mb-2">
-                        <img src="{{ asset('storage/' . $service->image_path) }}" alt="{{ $service->title }}" class="rounded border" style="height:128px;width:128px;object-fit:cover">
-                    </div>
+                <div class="mb-2">
+                    <img src="{{ asset('storage/' . $service->image_path) }}" alt="{{ $service->title }}" class="rounded border" style="height:128px;width:128px;object-fit:cover">
+                </div>
                 @endif
                 <input class="form-control" id="image" type="file" name="image">
             </div>
@@ -69,16 +69,16 @@
                 <input type="hidden" name="project_ids_present" value="1">
                 <div class="card p-2" style="max-height: 200px; overflow-y: auto;">
                     @if($projects->count() > 0)
-                        @foreach($projects as $project)
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="project_ids[]" value="{{ $project->id }}" id="project_{{ $project->id }}" {{ in_array($project->id, old('project_ids', $service->projects->pluck('id')->toArray())) ? 'checked' : '' }}>
-                                <label class="form-check-label" for="project_{{ $project->id }}">
-                                    {{ $project->title }}
-                                </label>
-                            </div>
-                        @endforeach
+                    @foreach($projects as $project)
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="project_ids[]" value="{{ $project->id }}" id="project_{{ $project->id }}" {{ in_array($project->id, old('project_ids', $service->projects->pluck('id')->toArray())) ? 'checked' : '' }}>
+                        <label class="form-check-label" for="project_{{ $project->id }}">
+                            {{ $project->title }}
+                        </label>
+                    </div>
+                    @endforeach
                     @else
-                        <p class="text-muted small mb-0">لا توجد مشاريع متاحة.</p>
+                    <p class="text-muted small mb-0">لا توجد مشاريع متاحة.</p>
                     @endif
                 </div>
                 <small class="text-muted">المشاريع المحددة ستكون تابعة لهذه الخدمة. إلغاء التحديد سيفك الارتباط.</small>
@@ -98,6 +98,12 @@
                 <textarea class="form-control" id="meta_description" name="meta_description" rows="3">{{ old('meta_description', $service->meta_description) }}</textarea>
                 <small class="text-muted d-block mt-1">وصف مختصر يظهر في نتائج البحث.</small>
             </div>
+
+            @include('admin.partials.keywords-fields', [
+            'keywords' => $keywords,
+            'metaKeywordIds' => $metaKeywordIds,
+            'contentKeywordIds' => $contentKeywordIds,
+            ])
 
             <div class="text-end">
                 <button class="btn btn-primary" type="submit">تحديث الخدمة</button>

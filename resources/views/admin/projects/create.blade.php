@@ -12,18 +12,18 @@
     <div class="card p-3">
         <form action="{{ route('admin.projects.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
-            
+
             <div class="row g-3">
                 <div class="col-md-6">
                     <label class="form-label" for="service_id">الخدمة التابعة</label>
                     <select class="form-select @error('service_id') is-invalid @enderror" id="service_id" name="service_id" required>
                         <option value="">اختر الخدمة...</option>
                         @foreach($services as $service)
-                            <option value="{{ $service->id }}" {{ old('service_id') == $service->id ? 'selected' : '' }}>{{ $service->title }}</option>
+                        <option value="{{ $service->id }}" {{ old('service_id') == $service->id ? 'selected' : '' }}>{{ $service->title }}</option>
                         @endforeach
                     </select>
                     @error('service_id')
-                        <div class="invalid-feedback">{{ $message }}</div>
+                    <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
 
@@ -31,7 +31,7 @@
                     <label class="form-label" for="title">عنوان المشروع</label>
                     <input class="form-control @error('title') is-invalid @enderror" id="title" type="text" name="title" value="{{ old('title') }}" required>
                     @error('title')
-                        <div class="invalid-feedback">{{ $message }}</div>
+                    <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
 
@@ -49,7 +49,7 @@
                     <label class="form-label" for="slug">السلاج (عنوان الرابط)</label>
                     <input class="form-control @error('slug') is-invalid @enderror" id="slug" type="text" name="slug" value="{{ old('slug') }}" placeholder="مثال: project-title">
                     @error('slug')
-                        <div class="invalid-feedback">{{ $message }}</div>
+                    <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                     <small class="text-muted d-block mt-1">اتركه فارغاً ليتم توليده تلقائياً من العنوان.</small>
                 </div>
@@ -69,7 +69,7 @@
                 <label class="form-label" for="main_image">الصورة الرئيسية (مطلوبة)</label>
                 <input class="form-control @error('main_image') is-invalid @enderror" id="main_image" type="file" name="main_image" required>
                 @error('main_image')
-                    <div class="invalid-feedback">{{ $message }}</div>
+                <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
             </div>
 
@@ -100,6 +100,12 @@
                 <textarea class="form-control" id="meta_description" name="meta_description" rows="3">{{ old('meta_description') }}</textarea>
                 <small class="text-muted d-block mt-1">وصف مختصر يظهر في نتائج البحث.</small>
             </div>
+
+            @include('admin.partials.keywords-fields', [
+            'keywords' => $keywords,
+            'metaKeywordIds' => [],
+            'contentKeywordIds' => [],
+            ])
 
             <div class="text-end">
                 <button class="btn btn-primary" type="submit">حفظ المشروع</button>
