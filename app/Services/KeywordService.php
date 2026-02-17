@@ -174,10 +174,12 @@ class KeywordService
         return $ids;
     }
 
-    public function syncContexts(Model $model, array $metaKeywordIds, array $contentKeywordIds): void
+    public function syncContexts(Model $model, array $metaKeywordIds, array $contentKeywordIds, array $primaryKeywordIds = [], array $keywordWeights = []): void
     {
         $meta = array_values(array_unique(array_map('intval', $metaKeywordIds)));
         $content = array_values(array_unique(array_map('intval', $contentKeywordIds)));
+        $primary = array_values(array_unique(array_map('intval', Arr::wrap($primaryKeywordIds))));
+        $weights = is_array($keywordWeights) ? $keywordWeights : [];
 
         $sync = [];
         foreach ($meta as $id) {
@@ -194,6 +196,21 @@ class KeywordService
             } else {
                 $sync[$id] = ['context' => 'content', 'is_primary' => false, 'weight' => 0];
             }
+        }
+
+        foreach ($sync as $id => $pivot) {
+            $isPrimary = in_array((int) $id, $primary, true);
+            $w = $weights[$id] ?? 0;
+            $w = is_numeric($w) ? (int) $w : 0;
+            if ($w < 0) {
+                $w = 0;
+            }
+            if ($w > 65535) {
+                $w = 65535;
+            }
+
+            $sync[$id]['is_primary'] = $isPrimary;
+            $sync[$id]['weight'] = $w;
         }
 
         $model->keywords()->sync($sync);

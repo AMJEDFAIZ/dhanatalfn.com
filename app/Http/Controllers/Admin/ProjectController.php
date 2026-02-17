@@ -54,6 +54,10 @@ class ProjectController extends Controller
             'content_keyword_ids' => 'nullable|array',
             'content_keyword_ids.*' => 'integer|exists:keywords,id',
             'content_keyword_names' => 'nullable|string',
+            'keyword_primary_ids' => 'nullable|array',
+            'keyword_primary_ids.*' => 'integer|exists:keywords,id',
+            'keyword_weights' => 'nullable|array',
+            'keyword_weights.*' => 'nullable|integer|min:0|max:65535',
         ]);
 
         $data = $request->except('main_image', 'meta_keyword_ids', 'meta_keyword_names', 'content_keyword_ids', 'content_keyword_names');
@@ -106,7 +110,13 @@ class ProjectController extends Controller
                     'ar',
                     $userId
                 );
-                $keywordService->syncContexts($project, $metaIds, $contentIds);
+                $keywordService->syncContexts(
+                    $project,
+                    $metaIds,
+                    $contentIds,
+                    $request->input('keyword_primary_ids', []),
+                    $request->input('keyword_weights', [])
+                );
             });
         } catch (\Throwable $e) {
             if ($newImagePath) {
@@ -138,7 +148,18 @@ class ProjectController extends Controller
             ->values()
             ->all();
 
-        return view('admin.projects.edit', compact('project', 'services', 'keywords', 'metaKeywordIds', 'contentKeywordIds'));
+        $keywordPrimaryIds = $project->keywords
+            ->filter(fn($k) => (bool) $k->pivot->is_primary)
+            ->pluck('id')
+            ->map(fn($id) => (int) $id)
+            ->values()
+            ->all();
+
+        $keywordWeights = $project->keywords
+            ->mapWithKeys(fn($k) => [(int) $k->id => (int) $k->pivot->weight])
+            ->all();
+
+        return view('admin.projects.edit', compact('project', 'services', 'keywords', 'metaKeywordIds', 'contentKeywordIds', 'keywordPrimaryIds', 'keywordWeights'));
     }
 
     public function update(Request $request, Project $project)
@@ -162,6 +183,10 @@ class ProjectController extends Controller
             'content_keyword_ids' => 'nullable|array',
             'content_keyword_ids.*' => 'integer|exists:keywords,id',
             'content_keyword_names' => 'nullable|string',
+            'keyword_primary_ids' => 'nullable|array',
+            'keyword_primary_ids.*' => 'integer|exists:keywords,id',
+            'keyword_weights' => 'nullable|array',
+            'keyword_weights.*' => 'nullable|integer|min:0|max:65535',
         ]);
 
         $data = $request->except('main_image', 'meta_keyword_ids', 'meta_keyword_names', 'content_keyword_ids', 'content_keyword_names');
@@ -209,7 +234,13 @@ class ProjectController extends Controller
                     'ar',
                     $userId
                 );
-                $keywordService->syncContexts($project, $metaIds, $contentIds);
+                $keywordService->syncContexts(
+                    $project,
+                    $metaIds,
+                    $contentIds,
+                    $request->input('keyword_primary_ids', []),
+                    $request->input('keyword_weights', [])
+                );
             });
         } catch (\Throwable $e) {
             if ($newImagePath) {

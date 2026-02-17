@@ -103,6 +103,8 @@
             'keywords' => $keywords,
             'metaKeywordIds' => $metaKeywordIds,
             'contentKeywordIds' => $contentKeywordIds,
+            'keywordPrimaryIds' => $keywordPrimaryIds,
+            'keywordWeights' => $keywordWeights,
             ])
 
             <div class="text-end">

@@ -28,7 +28,7 @@ class BlogController extends Controller
         $meta_description = Setting::where('key', 'blog_meta_description')->value('value') ?? 'اقرأ أحدث المقالات والنصائح في مجال المقاولات والبناء.';
         $seoPage = app(SeoPageService::class)->getByKey('blog_index');
         $meta_keywords = app(SeoMetaService::class)->keywordsString($seoPage?->keywordsForMeta() ?? []);
-        $pageContentKeywords = $seoPage?->contentKeywords()->where('keywords.active', true)->orderBy('keywords.name')->get() ?? collect();
+        $pageContentKeywords = $seoPage?->contentKeywords()->where('keywords.active', true)->get() ?? collect();
 
         return view('blog.index', compact('posts', 'meta_title', 'meta_description', 'meta_keywords', 'search', 'pageContentKeywords'));
     }
@@ -71,7 +71,7 @@ class BlogController extends Controller
             'fallback_keywords' => [$post->title],
         ]);
         $meta_keywords = $meta['meta_keywords'];
-        $contentKeywords = $post->contentKeywords()->where('keywords.active', true)->orderBy('keywords.name')->get();
+        $contentKeywords = $post->contentKeywords()->where('keywords.active', true)->get();
 
         return view('blog.show', compact('post', 'prevPost', 'nextPost', 'recentPosts', 'meta_title', 'meta_description', 'meta_keywords', 'contentKeywords'));
     }

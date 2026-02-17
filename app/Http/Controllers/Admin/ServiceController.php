@@ -54,6 +54,10 @@ class ServiceController extends Controller
             'content_keyword_ids' => 'nullable|array',
             'content_keyword_ids.*' => 'integer|exists:keywords,id',
             'content_keyword_names' => 'nullable|string',
+            'keyword_primary_ids' => 'nullable|array',
+            'keyword_primary_ids.*' => 'integer|exists:keywords,id',
+            'keyword_weights' => 'nullable|array',
+            'keyword_weights.*' => 'nullable|integer|min:0|max:65535',
         ]);
 
         $data = $request->except('image', 'project_ids', 'meta_keyword_ids', 'meta_keyword_names', 'content_keyword_ids', 'content_keyword_names');
@@ -105,7 +109,13 @@ class ServiceController extends Controller
                     'ar',
                     $userId
                 );
-                $keywordService->syncContexts($service, $metaIds, $contentIds);
+                $keywordService->syncContexts(
+                    $service,
+                    $metaIds,
+                    $contentIds,
+                    $request->input('keyword_primary_ids', []),
+                    $request->input('keyword_weights', [])
+                );
             });
         } catch (\Throwable $e) {
             if ($newImagePath) {
@@ -139,7 +149,18 @@ class ServiceController extends Controller
             ->values()
             ->all();
 
-        return view('admin.services.edit', compact('service', 'projects', 'keywords', 'metaKeywordIds', 'contentKeywordIds'));
+        $keywordPrimaryIds = $service->keywords
+            ->filter(fn($k) => (bool) $k->pivot->is_primary)
+            ->pluck('id')
+            ->map(fn($id) => (int) $id)
+            ->values()
+            ->all();
+
+        $keywordWeights = $service->keywords
+            ->mapWithKeys(fn($k) => [(int) $k->id => (int) $k->pivot->weight])
+            ->all();
+
+        return view('admin.services.edit', compact('service', 'projects', 'keywords', 'metaKeywordIds', 'contentKeywordIds', 'keywordPrimaryIds', 'keywordWeights'));
     }
 
     public function update(Request $request, Service $service)
@@ -166,6 +187,10 @@ class ServiceController extends Controller
             'content_keyword_ids' => 'nullable|array',
             'content_keyword_ids.*' => 'integer|exists:keywords,id',
             'content_keyword_names' => 'nullable|string',
+            'keyword_primary_ids' => 'nullable|array',
+            'keyword_primary_ids.*' => 'integer|exists:keywords,id',
+            'keyword_weights' => 'nullable|array',
+            'keyword_weights.*' => 'nullable|integer|min:0|max:65535',
         ]);
 
         $data = $request->except('image', 'meta_keyword_ids', 'meta_keyword_names', 'content_keyword_ids', 'content_keyword_names');
@@ -228,7 +253,13 @@ class ServiceController extends Controller
                     'ar',
                     $userId
                 );
-                $keywordService->syncContexts($service, $metaIds, $contentIds);
+                $keywordService->syncContexts(
+                    $service,
+                    $metaIds,
+                    $contentIds,
+                    $request->input('keyword_primary_ids', []),
+                    $request->input('keyword_weights', [])
+                );
             });
         } catch (\Throwable $e) {
             if ($newImagePath) {

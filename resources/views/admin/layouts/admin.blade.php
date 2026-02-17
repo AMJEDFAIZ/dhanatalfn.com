@@ -7,7 +7,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', $settings['site_name'] ?? 'لوحة الإدارة') - إدارة</title>
     @if (isset($settings['site_favicon']))
-    <link rel="icon" href="{{ asset('storage/' . $settings['site_favicon']) ?? asset('assets/img/favicon.ico') }}"
+    <link rel="icon" href="{{ asset('storage/' . $settings['site_favicon']) ?? asset('favicon.ico') }}"
         type="image/x-icon">
     @endif
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">

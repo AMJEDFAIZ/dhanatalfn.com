@@ -75,6 +75,8 @@
             'keywords' => $keywords,
             'metaKeywordIds' => [],
             'contentKeywordIds' => [],
+            'keywordPrimaryIds' => [],
+            'keywordWeights' => [],
             ])
 
             <hr class="my-3">
@@ -126,11 +128,7 @@
             });
         }
 
-        let faqIndex = {
-            {
-                is_array(old('faqs')) ? count(old('faqs')) : 0
-            }
-        };
+        let faqIndex ={{is_array(old('faqs')) ? count(old('faqs')) : 0}};
 
         document.getElementById('add-faq').addEventListener('click', function() {
             const container = document.getElementById('faqs-container');

@@ -49,6 +49,10 @@ class BlogController extends Controller
             'content_keyword_ids' => 'nullable|array',
             'content_keyword_ids.*' => 'integer|exists:keywords,id',
             'content_keyword_names' => 'nullable|string',
+            'keyword_primary_ids' => 'nullable|array',
+            'keyword_primary_ids.*' => 'integer|exists:keywords,id',
+            'keyword_weights' => 'nullable|array',
+            'keyword_weights.*' => 'nullable|integer|min:0|max:65535',
         ]);
 
         $data = $request->except(['image', 'faqs', 'meta_keyword_ids', 'meta_keyword_names', 'content_keyword_ids', 'content_keyword_names']);
@@ -92,7 +96,13 @@ class BlogController extends Controller
             'ar',
             $userId
         );
-        $keywordService->syncContexts($post, $metaIds, $contentIds);
+        $keywordService->syncContexts(
+            $post,
+            $metaIds,
+            $contentIds,
+            $request->input('keyword_primary_ids', []),
+            $request->input('keyword_weights', [])
+        );
 
         // Handle FAQs
         if ($request->has('faqs')) {
@@ -130,7 +140,18 @@ class BlogController extends Controller
             ->values()
             ->all();
 
-        return view('admin.blog.edit', compact('blog', 'keywords', 'metaKeywordIds', 'contentKeywordIds'));
+        $keywordPrimaryIds = $blog->keywords
+            ->filter(fn($k) => (bool) $k->pivot->is_primary)
+            ->pluck('id')
+            ->map(fn($id) => (int) $id)
+            ->values()
+            ->all();
+
+        $keywordWeights = $blog->keywords
+            ->mapWithKeys(fn($k) => [(int) $k->id => (int) $k->pivot->weight])
+            ->all();
+
+        return view('admin.blog.edit', compact('blog', 'keywords', 'metaKeywordIds', 'contentKeywordIds', 'keywordPrimaryIds', 'keywordWeights'));
     }
 
     public function update(Request $request, BlogPost $blog)
@@ -153,6 +174,10 @@ class BlogController extends Controller
             'content_keyword_ids' => 'nullable|array',
             'content_keyword_ids.*' => 'integer|exists:keywords,id',
             'content_keyword_names' => 'nullable|string',
+            'keyword_primary_ids' => 'nullable|array',
+            'keyword_primary_ids.*' => 'integer|exists:keywords,id',
+            'keyword_weights' => 'nullable|array',
+            'keyword_weights.*' => 'nullable|integer|min:0|max:65535',
         ]);
 
         $data = $request->except(['image', 'faqs', 'meta_keyword_ids', 'meta_keyword_names', 'content_keyword_ids', 'content_keyword_names']);
@@ -198,7 +223,13 @@ class BlogController extends Controller
             'ar',
             $userId
         );
-        $keywordService->syncContexts($blog, $metaIds, $contentIds);
+        $keywordService->syncContexts(
+            $blog,
+            $metaIds,
+            $contentIds,
+            $request->input('keyword_primary_ids', []),
+            $request->input('keyword_weights', [])
+        );
 
         // Handle FAQs
         if ($request->has('faqs')) {

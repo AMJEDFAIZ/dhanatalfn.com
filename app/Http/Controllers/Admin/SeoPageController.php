@@ -42,7 +42,18 @@ class SeoPageController extends Controller
             ->values()
             ->all();
 
-        return view('admin.seo-pages.edit', compact('seoPage', 'keywords', 'metaKeywordIds', 'contentKeywordIds'));
+        $keywordPrimaryIds = $seoPage->keywords
+            ->filter(fn($k) => (bool) $k->pivot->is_primary)
+            ->pluck('id')
+            ->map(fn($id) => (int) $id)
+            ->values()
+            ->all();
+
+        $keywordWeights = $seoPage->keywords
+            ->mapWithKeys(fn($k) => [(int) $k->id => (int) $k->pivot->weight])
+            ->all();
+
+        return view('admin.seo-pages.edit', compact('seoPage', 'keywords', 'metaKeywordIds', 'contentKeywordIds', 'keywordPrimaryIds', 'keywordWeights'));
     }
 
     public function update(Request $request, SeoPage $seoPage, KeywordService $keywordService)
@@ -54,6 +65,10 @@ class SeoPageController extends Controller
             'content_keyword_ids' => ['nullable', 'array'],
             'content_keyword_ids.*' => ['integer', 'exists:keywords,id'],
             'content_keyword_names' => ['nullable', 'string'],
+            'keyword_primary_ids' => ['nullable', 'array'],
+            'keyword_primary_ids.*' => ['integer', 'exists:keywords,id'],
+            'keyword_weights' => ['nullable', 'array'],
+            'keyword_weights.*' => ['nullable', 'integer', 'min:0', 'max:65535'],
         ]);
 
         $userId = Auth::id();
@@ -75,7 +90,13 @@ class SeoPageController extends Controller
             $userId,
         );
 
-        $keywordService->syncContexts($seoPage, $metaIds, $contentIds);
+        $keywordService->syncContexts(
+            $seoPage,
+            $metaIds,
+            $contentIds,
+            $validated['keyword_primary_ids'] ?? [],
+            $validated['keyword_weights'] ?? []
+        );
 
         return redirect()->route('admin.seo-pages.index')->with('success', 'تم تحديث كلمات الصفحة بنجاح');
     }

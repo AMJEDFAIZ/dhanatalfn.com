@@ -15,12 +15,20 @@ trait HasKeywords
 
     public function metaKeywords()
     {
-        return $this->keywords()->wherePivotIn('context', ['meta', 'both']);
+        return $this->keywords()
+            ->wherePivotIn('context', ['meta', 'both'])
+            ->orderByDesc('keywordables.is_primary')
+            ->orderByDesc('keywordables.weight')
+            ->orderBy('keywords.name');
     }
 
     public function contentKeywords()
     {
-        return $this->keywords()->wherePivotIn('context', ['content', 'both']);
+        return $this->keywords()
+            ->wherePivotIn('context', ['content', 'both'])
+            ->orderByDesc('keywordables.is_primary')
+            ->orderByDesc('keywordables.weight')
+            ->orderBy('keywords.name');
     }
 
     public function keywordsForMeta(int $limit = 12): array

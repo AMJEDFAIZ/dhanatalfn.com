@@ -18,7 +18,7 @@ class ProjectController extends Controller
         $meta_description = Setting::where('key', 'projects_meta_description')->value('value') ?? 'تصفح أحدث مشاريعنا المنفذة بجودة واحترافية.';
         $seoPage = app(SeoPageService::class)->getByKey('projects_index');
         $meta_keywords = app(SeoMetaService::class)->keywordsString($seoPage?->keywordsForMeta() ?? []);
-        $pageContentKeywords = $seoPage?->contentKeywords()->where('keywords.active', true)->orderBy('keywords.name')->get() ?? collect();
+        $pageContentKeywords = $seoPage?->contentKeywords()->where('keywords.active', true)->get() ?? collect();
 
         return view('projects.index', compact('projects', 'meta_title', 'meta_description', 'meta_keywords', 'settings', 'pageContentKeywords'));
     }
@@ -40,7 +40,7 @@ class ProjectController extends Controller
         $meta_title = $meta['meta_title'];
         $meta_description = $meta['meta_description'] ?: Str::limit(strip_tags($project->description ?? ''), 160);
         $meta_keywords = $meta['meta_keywords'];
-        $contentKeywords = $project->contentKeywords()->where('keywords.active', true)->orderBy('keywords.name')->get();
+        $contentKeywords = $project->contentKeywords()->where('keywords.active', true)->get();
 
         return view('projects.show', compact('project', 'projectImages', 'meta_title', 'meta_description', 'meta_keywords', 'settings', 'sidebarProjects', 'contentKeywords'));
     }

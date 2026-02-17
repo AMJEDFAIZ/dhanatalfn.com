@@ -105,6 +105,8 @@
             'keywords' => $keywords,
             'metaKeywordIds' => [],
             'contentKeywordIds' => [],
+            'keywordPrimaryIds' => [],
+            'keywordWeights' => [],
             ])
 
             <div class="text-end">

@@ -397,7 +397,5 @@ $addToGraph([
 @endphp
 
 <script type="application/ld+json">
-    {
-        !!json_encode($schema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) !!
-    }
+    {!!json_encode($schema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) !!}
 </script>

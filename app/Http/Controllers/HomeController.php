@@ -37,7 +37,7 @@ class HomeController extends Controller
 
         $seoPage = app(SeoPageService::class)->getByKey('home');
         $meta_keywords = app(SeoMetaService::class)->keywordsString($seoPage?->keywordsForMeta() ?? []);
-        $pageContentKeywords = $seoPage?->contentKeywords()->where('keywords.active', true)->orderBy('keywords.name')->get() ?? collect();
+        $pageContentKeywords = $seoPage?->contentKeywords()->where('keywords.active', true)->get() ?? collect();
 
         return view('home', compact('services', 'projects', 'testimonials', 'skills', 'latestPosts', 'meta_title', 'meta_description', 'meta_keywords', 'totalprojects', 'pageContentKeywords'));
     }
@@ -52,7 +52,7 @@ class HomeController extends Controller
 
         $seoPage = app(SeoPageService::class)->getByKey('about');
         $meta_keywords = app(SeoMetaService::class)->keywordsString($seoPage?->keywordsForMeta() ?? []);
-        $pageContentKeywords = $seoPage?->contentKeywords()->where('keywords.active', true)->orderBy('keywords.name')->get() ?? collect();
+        $pageContentKeywords = $seoPage?->contentKeywords()->where('keywords.active', true)->get() ?? collect();
 
         return view('about', compact('skills', 'settings', 'meta_title', 'meta_description', 'meta_keywords', 'totalprojects', 'pageContentKeywords'));
     }
@@ -68,7 +68,7 @@ class HomeController extends Controller
 
         $seoPage = app(SeoPageService::class)->getByKey('contact');
         $meta_keywords = app(SeoMetaService::class)->keywordsString($seoPage?->keywordsForMeta() ?? []);
-        $pageContentKeywords = $seoPage?->contentKeywords()->where('keywords.active', true)->orderBy('keywords.name')->get() ?? collect();
+        $pageContentKeywords = $seoPage?->contentKeywords()->where('keywords.active', true)->get() ?? collect();
 
         return view('contact', compact('settings', 'meta_title', 'meta_description', 'meta_keywords', 'pageContentKeywords'));
     }

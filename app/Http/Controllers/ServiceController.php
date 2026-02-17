@@ -19,7 +19,7 @@ class ServiceController extends Controller
         $meta_description = Setting::where('key', 'services_meta_description')->value('value') ?? 'أفضل معلم دهانات وديكورات جدة حي الروضة ت: 0532791522.';
         $seoPage = app(SeoPageService::class)->getByKey('services_index');
         $meta_keywords = app(SeoMetaService::class)->keywordsString($seoPage?->keywordsForMeta() ?? []);
-        $pageContentKeywords = $seoPage?->contentKeywords()->where('keywords.active', true)->orderBy('keywords.name')->get() ?? collect();
+        $pageContentKeywords = $seoPage?->contentKeywords()->where('keywords.active', true)->get() ?? collect();
         // $meta_keywords = collect([
         //     $settings['site_name'] ?? null,
         //     'من نحن',
@@ -99,7 +99,7 @@ class ServiceController extends Controller
         $meta_title = $meta['meta_title'];
         $meta_description = $meta['meta_description'] ?: Str::limit(strip_tags($service->description ?? ''), 160);
         $meta_keywords = $meta['meta_keywords'];
-        $contentKeywords = $service->contentKeywords()->where('keywords.active', true)->orderBy('keywords.name')->get();
+        $contentKeywords = $service->contentKeywords()->where('keywords.active', true)->get();
 
         return view('services.show', compact('service', 'sidebarServices', 'meta_title', 'meta_description', 'meta_keywords', 'settings', 'projects', 'contentKeywords'));
     }
