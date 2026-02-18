@@ -55,19 +55,52 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             @foreach ($items as $item)
             @if ($type === 'services')
-            <a href="{{ route('services.show', $item->slug) }}" class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-all">
-                <div class="text-primary font-bold text-lg mb-2">{{ $item->title }}</div>
-                <div class="text-gray-600 text-sm line-clamp-3">{{ Str::limit(strip_tags($item->description ?? ''), 140) }}</div>
+            <a href="{{ route('services.show', $item->slug) }}" class="group bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-all">
+                <div class="relative w-full aspect-[16/10] bg-gray-100 overflow-hidden">
+                    @if (!empty($item->image_path))
+                    <img src="{{ asset('storage/' . $item->image_path) }}" alt="{{ $item->title }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" loading="lazy" decoding="async">
+                    @else
+                    <div class="w-full h-full flex items-center justify-center bg-primary/10 text-primary text-3xl font-bold">
+                        {{ Str::substr($item->title, 0, 1) }}
+                    </div>
+                    @endif
+                </div>
+                <div class="p-6">
+                    <div class="text-primary font-bold text-lg mb-2">{{ $item->title }}</div>
+                    <div class="text-gray-600 text-sm line-clamp-3">{{ Str::limit(strip_tags($item->description ?? ''), 140) }}</div>
+                </div>
             </a>
             @elseif ($type === 'projects')
-            <a href="{{ route('projects.show', $item->slug) }}" class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-all">
-                <div class="text-primary font-bold text-lg mb-2">{{ $item->title }}</div>
-                <div class="text-gray-600 text-sm line-clamp-3">{{ Str::limit(strip_tags($item->description ?? ''), 140) }}</div>
+            <a href="{{ route('projects.show', $item->slug) }}" class="group bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-all">
+                <div class="relative w-full aspect-[16/10] bg-gray-100 overflow-hidden">
+                    @if (!empty($item->main_image))
+                    <img src="{{ asset('storage/' . $item->main_image) }}" alt="{{ $item->title }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" loading="lazy" decoding="async">
+                    @else
+                    <div class="w-full h-full flex items-center justify-center bg-primary/10 text-primary text-3xl font-bold">
+                        {{ Str::substr($item->title, 0, 1) }}
+                    </div>
+                    @endif
+                </div>
+                <div class="p-6">
+                    <div class="text-primary font-bold text-lg mb-2">{{ $item->title }}</div>
+                    <div class="text-gray-600 text-sm line-clamp-3">{{ Str::limit(strip_tags($item->description ?? ''), 140) }}</div>
+                </div>
             </a>
             @else
-            <a href="{{ route('blog.show', $item->slug) }}" class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-all">
-                <div class="text-primary font-bold text-lg mb-2">{{ $item->title }}</div>
-                <div class="text-gray-600 text-sm line-clamp-3">{{ Str::limit(strip_tags($item->content ?? ''), 140) }}</div>
+            <a href="{{ route('blog.show', $item->slug) }}" class="group bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-all">
+                <div class="relative w-full aspect-[16/10] bg-gray-100 overflow-hidden">
+                    @if (!empty($item->image_path))
+                    <img src="{{ asset('storage/' . $item->image_path) }}" alt="{{ $item->title }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" loading="lazy" decoding="async">
+                    @else
+                    <div class="w-full h-full flex items-center justify-center bg-primary/10 text-primary text-3xl font-bold">
+                        {{ Str::substr($item->title, 0, 1) }}
+                    </div>
+                    @endif
+                </div>
+                <div class="p-6">
+                    <div class="text-primary font-bold text-lg mb-2">{{ $item->title }}</div>
+                    <div class="text-gray-600 text-sm line-clamp-3">{{ Str::limit(strip_tags($item->content ?? ''), 140) }}</div>
+                </div>
             </a>
             @endif
             @endforeach
@@ -84,9 +117,20 @@
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 @foreach ($services as $item)
-                <a href="{{ route('services.show', $item->slug) }}" class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-all">
-                    <div class="text-primary font-bold text-lg mb-2">{{ $item->title }}</div>
-                    <div class="text-gray-600 text-sm line-clamp-3">{{ Str::limit(strip_tags($item->description ?? ''), 140) }}</div>
+                <a href="{{ route('services.show', $item->slug) }}" class="group bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-all">
+                    <div class="relative w-full aspect-[16/10] bg-gray-100 overflow-hidden">
+                        @if (!empty($item->image_path))
+                        <img src="{{ asset('storage/' . $item->image_path) }}" alt="{{ $item->title }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" loading="lazy" decoding="async">
+                        @else
+                        <div class="w-full h-full flex items-center justify-center bg-primary/10 text-primary text-3xl font-bold">
+                            {{ Str::substr($item->title, 0, 1) }}
+                        </div>
+                        @endif
+                    </div>
+                    <div class="p-6">
+                        <div class="text-primary font-bold text-lg mb-2">{{ $item->title }}</div>
+                        <div class="text-gray-600 text-sm line-clamp-3">{{ Str::limit(strip_tags($item->description ?? ''), 140) }}</div>
+                    </div>
                 </a>
                 @endforeach
             </div>
@@ -101,9 +145,20 @@
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 @foreach ($projects as $item)
-                <a href="{{ route('projects.show', $item->slug) }}" class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-all">
-                    <div class="text-primary font-bold text-lg mb-2">{{ $item->title }}</div>
-                    <div class="text-gray-600 text-sm line-clamp-3">{{ Str::limit(strip_tags($item->description ?? ''), 140) }}</div>
+                <a href="{{ route('projects.show', $item->slug) }}" class="group bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-all">
+                    <div class="relative w-full aspect-[16/10] bg-gray-100 overflow-hidden">
+                        @if (!empty($item->main_image))
+                        <img src="{{ asset('storage/' . $item->main_image) }}" alt="{{ $item->title }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" loading="lazy" decoding="async">
+                        @else
+                        <div class="w-full h-full flex items-center justify-center bg-primary/10 text-primary text-3xl font-bold">
+                            {{ Str::substr($item->title, 0, 1) }}
+                        </div>
+                        @endif
+                    </div>
+                    <div class="p-6">
+                        <div class="text-primary font-bold text-lg mb-2">{{ $item->title }}</div>
+                        <div class="text-gray-600 text-sm line-clamp-3">{{ Str::limit(strip_tags($item->description ?? ''), 140) }}</div>
+                    </div>
                 </a>
                 @endforeach
             </div>
@@ -118,9 +173,20 @@
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 @foreach ($posts as $item)
-                <a href="{{ route('blog.show', $item->slug) }}" class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-all">
-                    <div class="text-primary font-bold text-lg mb-2">{{ $item->title }}</div>
-                    <div class="text-gray-600 text-sm line-clamp-3">{{ Str::limit(strip_tags($item->content ?? ''), 140) }}</div>
+                <a href="{{ route('blog.show', $item->slug) }}" class="group bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-all">
+                    <div class="relative w-full aspect-[16/10] bg-gray-100 overflow-hidden">
+                        @if (!empty($item->image_path))
+                        <img src="{{ asset('storage/' . $item->image_path) }}" alt="{{ $item->title }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" loading="lazy" decoding="async">
+                        @else
+                        <div class="w-full h-full flex items-center justify-center bg-primary/10 text-primary text-3xl font-bold">
+                            {{ Str::substr($item->title, 0, 1) }}
+                        </div>
+                        @endif
+                    </div>
+                    <div class="p-6">
+                        <div class="text-primary font-bold text-lg mb-2">{{ $item->title }}</div>
+                        <div class="text-gray-600 text-sm line-clamp-3">{{ Str::limit(strip_tags($item->content ?? ''), 140) }}</div>
+                    </div>
                 </a>
                 @endforeach
             </div>

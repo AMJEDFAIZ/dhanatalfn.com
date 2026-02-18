@@ -75,12 +75,15 @@
                             <span class="text-gray-500 font-bold ml-2">مشاركة:</span>
                             {{-- روابط مشاركة حقيقية --}}
                             <a href="https://facebook.com/sharer/sharer.php?u={{ url()->current() }}" target="_blank"
+                                rel="noopener noreferrer"
                                 class="text-gray-400 hover:text-[#1877F2] text-xl transition-colors"><i
                                     class="fa-brands fa-facebook"></i></a>
                             <a href="https://twitter.com/intent/tweet?url={{ url()->current() }}&text={{ $service->title }}"
-                                target="_blank" class="text-gray-400 hover:text-[#1DA1F2] text-xl transition-colors"><i
+                                target="_blank" rel="noopener noreferrer"
+                                class="text-gray-400 hover:text-[#1DA1F2] text-xl transition-colors"><i
                                     class="fa-brands fa-twitter"></i></a>
                             <a href="https://wa.me/?text={{ $service->title }} {{ url()->current() }}" target="_blank"
+                                rel="noopener noreferrer"
                                 class="text-gray-400 hover:text-[#25D366] text-xl transition-colors"><i
                                     class="fa-brands fa-whatsapp"></i></a>
                         </div>
@@ -97,7 +100,7 @@
                                     @if ($project->main_image)
                                     <img src="{{ asset('storage/' . $project->main_image) }}"
                                         alt="{{ $project->title }}"
-                                        class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500" loading="lazy" decoding="async" >
+                                        class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500" loading="lazy" decoding="async">
                                     @else
                                     <div
                                         class="w-full h-full bg-gray-200 flex items-center justify-center text-gray-400">
@@ -234,6 +237,7 @@
                                 <i class="fab fa-whatsapp"></i>
                             </div>
                             <span> <a href="{{ $settings['whatsapp'] ?? '+966532791522' }}" target="_blank"
+                                    rel="noopener noreferrer"
                                     class="hover:text-accent">{{ $settings['phone'] ?? '+966 5 3279 1522' }}</a></span>
                         </li>
                     </ul>

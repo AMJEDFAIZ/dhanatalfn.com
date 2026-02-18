@@ -5,16 +5,22 @@ const mobileMenu = document.getElementById('mobile-menu');
 const mobileLinks = document.querySelectorAll('.mobile-link');
 
 function toggleMenu() {
+    if (!mobileMenu) return;
+    const willOpen = mobileMenu.classList.contains('-translate-x-full');
     mobileMenu.classList.toggle('-translate-x-full');
-    document.body.classList.toggle('overflow-hidden');
+    document.body.classList.toggle('overflow-hidden', willOpen);
+    if (mobileMenuBtn) mobileMenuBtn.setAttribute('aria-expanded', String(willOpen));
+    mobileMenu.setAttribute('aria-hidden', String(!willOpen));
+    if (willOpen && closeMenuBtn) closeMenuBtn.focus();
+    if (!willOpen && mobileMenuBtn) mobileMenuBtn.focus();
 }
 
 if (mobileMenuBtn) {
-    mobileMenuBtn.addEventListener('click', toggleMenu);
+    mobileMenuBtn.addEventListener('click', toggleMenu, { passive: true });
 }
 
 if (closeMenuBtn) {
-    closeMenuBtn.addEventListener('click', toggleMenu);
+    closeMenuBtn.addEventListener('click', toggleMenu, { passive: true });
 }
 
 mobileLinks.forEach(link => {
@@ -25,35 +31,40 @@ mobileLinks.forEach(link => {
     });
 });
 
+document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    if (!mobileMenu) return;
+    if (!mobileMenu.classList.contains('-translate-x-full')) {
+        toggleMenu();
+    }
+});
+
 // Header Scroll Effect
 const header = document.getElementById('header');
 
 window.addEventListener('scroll', () => {
+    if (!header) return;
     if (window.scrollY > 50) {
-        header.classList.add('shadow-md', 'py-2');
-        header.classList.remove('py-3');
+        header.classList.add('shadow-md');
+        header.classList.remove('shadow-sm');
     } else {
-        header.classList.remove('shadow-md', 'py-2');
-        header.classList.add('py-3');
+        header.classList.remove('shadow-md');
+        header.classList.add('shadow-sm');
     }
-});
+}, { passive: true });
 
-// Reveal Animations on Scroll
-function reveal() {
-    var reveals = document.querySelectorAll(".reveal");
+const reveals = document.querySelectorAll('.reveal');
+if (reveals.length > 0) {
+    const revealObserver = new IntersectionObserver((entries, obs) => {
+        entries.forEach(entry => {
+            if (!entry.isIntersecting) return;
+            entry.target.classList.add('active');
+            obs.unobserve(entry.target);
+        });
+    }, { root: null, threshold: 0.1, rootMargin: '0px 0px -10% 0px' });
 
-    for (var i = 0; i < reveals.length; i++) {
-        var windowHeight = window.innerHeight;
-        var elementTop = reveals[i].getBoundingClientRect().top;
-        var elementVisible = 150;
-
-        if (elementTop < windowHeight - elementVisible) {
-            reveals[i].classList.add("active");
-        }
-    }
+    reveals.forEach(el => revealObserver.observe(el));
 }
-
-window.addEventListener("scroll", reveal);
 
 // Portfolio Filter
 const filterButtons = document.querySelectorAll('.portfolio-filter');
@@ -102,19 +113,19 @@ let countersStarted = false;
 
 function startCount(el) {
     const goal = parseInt(el.dataset.goal);
-    let count = 0;
-    const duration = 2000; // 2 seconds
-    const increment = goal / (duration / 16); // 60fps
+    const suffix = el.dataset.suffix || '';
+    const duration = 2000;
+    const start = performance.now();
+    const from = 0;
 
-    let timer = setInterval(() => {
-        count += increment;
-        if (count >= goal) {
-            el.textContent = goal + (el.dataset.suffix || '');
-            clearInterval(timer);
-        } else {
-            el.textContent = Math.floor(count) + (el.dataset.suffix || '');
-        }
-    }, 16);
+    function tick(now) {
+        const t = Math.min(1, (now - start) / duration);
+        const value = Math.floor(from + (goal - from) * t);
+        el.textContent = value + suffix;
+        if (t < 1) requestAnimationFrame(tick);
+    }
+
+    requestAnimationFrame(tick);
 }
 
 // Intersection Observer for Skills and Counters
@@ -160,6 +171,9 @@ function updateCurrentImages() {
 
     // Filter out hidden images (those in hidden parents)
     currentImages = allCandidates.filter(img => {
+        if (img.closest('a')) {
+            return false;
+        }
         const parent = img.closest('.gallery-item, .portfolio-item');
         if (parent && parent.classList.contains('hidden')) {
             return false;
@@ -294,6 +308,7 @@ function prevImage() {
 function initLightboxTriggers() {
     const triggers = document.querySelectorAll('.gallery-item img, .portfolio-item img, .lightbox-trigger img');
     triggers.forEach(img => {
+        if (img.closest('a')) return;
         img.style.cursor = 'zoom-in';
         img.onclick = (e) => {
             e.stopPropagation();
@@ -303,11 +318,11 @@ function initLightboxTriggers() {
         // Handle parent clicks if they are not links
         const parent = img.closest('.gallery-item, .portfolio-item');
         if (parent && !parent.querySelector('a')) { // Only if no link inside
-             parent.onclick = (e) => {
-                 if (e.target.tagName !== 'A') {
-                     openLightbox(img);
-                 }
-             };
+            parent.onclick = (e) => {
+                if (e.target.tagName !== 'A') {
+                    openLightbox(img);
+                }
+            };
         }
     });
 }
@@ -342,6 +357,3 @@ document.addEventListener('keydown', (e) => {
     if (e.key === 'ArrowRight') nextImage();
     if (e.key === 'ArrowLeft') prevImage();
 });
-
-
-

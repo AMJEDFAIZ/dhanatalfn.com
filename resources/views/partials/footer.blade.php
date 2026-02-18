@@ -19,45 +19,45 @@
                  <div class="flex space-x-reverse space-x-4">
 
                      @if (isset($settings['phone']))
-                         <a href="tel:{{ $settings['phone'] }}"
-                             class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-accent transition-colors"
-                             target="_blank"><i class="fas fa-phone"></i></a>
+                     <a href="tel:{{ $settings['phone'] }}"
+                         class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-accent transition-colors"><i
+                             class="fas fa-phone"></i></a>
                      @endif
 
-                     
+
                      @if (isset($settings['whatsapp']))
-                         <a href="{{ $settings['whatsapp'] }}"
-                             class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-accent transition-colors"
-                             target="_blank"><i class="fab fa-whatsapp"></i></a>
+                     <a href="{{ $settings['whatsapp'] }}"
+                         class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-accent transition-colors"
+                         target="_blank" rel="noopener noreferrer"><i class="fab fa-whatsapp"></i></a>
                      @endif
 
 
 
                      @if (isset($settings['tiktok']))
-                         <a href="{{ $settings['tiktok'] }}"
-                             class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-accent transition-colors"
-                             target="_blank"><i class="fab fa-tiktok"></i></a>
+                     <a href="{{ $settings['tiktok'] }}"
+                         class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-accent transition-colors"
+                         target="_blank" rel="noopener noreferrer"><i class="fab fa-tiktok"></i></a>
                      @endif
 
                      @if (isset($settings['facebook']))
-                         <a href="{{ $settings['facebook'] }}"
-                             class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-accent transition-colors"
-                             target="_blank"><i class="fab fa-facebook-f"></i></a>
+                     <a href="{{ $settings['facebook'] }}"
+                         class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-accent transition-colors"
+                         target="_blank" rel="noopener noreferrer"><i class="fab fa-facebook-f"></i></a>
                      @endif
                      @if (isset($settings['twitter']))
-                         <a href="{{ $settings['twitter'] }}"
-                             class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-accent transition-colors"
-                             target="_blank"><i class="fa-brands fa-twitter"></i></a>
+                     <a href="{{ $settings['twitter'] }}"
+                         class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-accent transition-colors"
+                         target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-twitter"></i></a>
                      @endif
                      @if (isset($settings['instagram']))
-                         <a href="{{ $settings['instagram'] }}"
-                             class=" w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-accent transition-colors "
-                             target="_blank"><i class="fab fa-instagram"></i></a>
+                     <a href="{{ $settings['instagram'] }}"
+                         class=" w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-accent transition-colors "
+                         target="_blank" rel="noopener noreferrer"><i class="fab fa-instagram"></i></a>
                      @endif
                      @if (isset($settings['linkedin']))
-                         <a href="{{ $settings['linkedin'] }}"
-                             class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-accent transition-colors"
-                             target="_blank"><i class="fab fa-linkedin-in"></i></a>
+                     <a href="{{ $settings['linkedin'] }}"
+                         class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-accent transition-colors"
+                         target="_blank" rel="noopener noreferrer"><i class="fab fa-linkedin-in"></i></a>
                      @endif
 
                  </div>
@@ -127,7 +127,8 @@
 
                          <i class="fab fa-whatsapp text-xs"></i>
                          <span dir="ltr" class="hover:text-accent transition-colors"> <a
-                                 href="{{ $settings['whatsapp'] ?? '+966 5 3279 1522' }}" target="_blank">+966 5 3279
+                                 href="{{ $settings['whatsapp'] ?? '+966 5 3279 1522' }}" target="_blank"
+                                 rel="noopener noreferrer">+966 5 3279
                                  1522</a></span>
                      </li>
                      <li class="hover:text-accent transition-colors flex items-center gap-2">

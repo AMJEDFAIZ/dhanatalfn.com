@@ -224,12 +224,15 @@
                     <span class="text-gray-500 font-bold ml-2">مشاركة:</span>
                     {{-- روابط مشاركة حقيقية --}}
                     <a href="https://facebook.com/sharer/sharer.php?u={{ url()->current() }}" target="_blank"
+                        rel="noopener noreferrer"
                         class="text-gray-400 hover:text-[#1877F2] text-xl transition-colors"><i
                             class="fa-brands fa-facebook"></i></a>
                     <a href="https://twitter.com/intent/tweet?url={{ url()->current() }}&text={{ $project->title }}"
-                        target="_blank" class="text-gray-400 hover:text-[#1DA1F2] text-xl transition-colors"><i
+                        target="_blank" rel="noopener noreferrer"
+                        class="text-gray-400 hover:text-[#1DA1F2] text-xl transition-colors"><i
                             class="fa-brands fa-twitter"></i></a>
                     <a href="https://wa.me/?text={{ $project->title }} {{ url()->current() }}" target="_blank"
+                        rel="noopener noreferrer"
                         class="text-gray-400 hover:text-[#25D366] text-xl transition-colors"><i
                             class="fa-brands fa-whatsapp"></i></a>
                 </div>
