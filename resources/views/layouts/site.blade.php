@@ -11,6 +11,7 @@
     $sectionMetaTitle = trim($__env->yieldContent('meta_title'));
     $sectionMetaDescription = trim($__env->yieldContent('meta_description'));
     $sectionMetaKeywords = trim($__env->yieldContent('meta_keywords'));
+    $sectionMetaImage = trim($__env->yieldContent('meta_image'));
 
     $resolvedMetaTitle =
     $meta_title ??
@@ -69,11 +70,15 @@
         content="{{ $settings['site_author'] ?? ($settings['site_name'] ?? 'معلم دهانات وديكورات جدة ت: 0532791522') }}">
     {{-- <meta name="robots" content="index, follow"> --}}
     <meta name="robots" content="{{ $robotsContent }}">
+    <meta name="googlebot" content="{{ $robotsContent }}">
+    <meta name="bingbot" content="{{ $robotsContent }}">
     <meta name="theme-color" content="#0A192F">
 
     {{-- ===== Canonical (مهم جدًا للسيو) ===== --}}
     {{-- <!--<link rel="canonical" href="{{ url()->current() }}">--> --}}
     <link rel="canonical" href="{{ $canonicalUrl }}">
+    <link rel="alternate" hreflang="ar-SA" href="{{ $canonicalUrl }}">
+    <link rel="alternate" hreflang="x-default" href="{{ $canonicalUrl }}">
 
     <meta name="google-site-verification" content="_lMgioCLkmTGQmIVOxTCzpYviw6IC71fpk3xgCBxvXU" />
 
@@ -100,23 +105,77 @@
     @if (!empty($modifiedIso))
     <meta property="article:modified_time" content="{{ $modifiedIso }}">
     @endif
+    @if (!empty($modifiedIso))
+    <meta property="og:updated_time" content="{{ $modifiedIso }}">
+    @endif
+    @if (isset($contentKeywords) && $contentKeywords && method_exists($contentKeywords, 'pluck'))
+    @foreach ($contentKeywords->pluck('name')->filter()->unique() as $tag)
+    <meta property="article:tag" content="{{ $tag }}">
+    @endforeach
+    @endif
     @endif
 
     @php
-    $ogImage =
+    $siteLogoImage =
     isset($settings['site_logo']) && $settings['site_logo']
     ? asset('storage/' . $settings['site_logo'])
     : asset('assets/img/logo.png');
 
-    if (request()->routeIs('blog.show') && isset($post) && is_object($post) && !empty($post->image_path ?? null)) {
-    $ogImage = asset('storage/' . $post->image_path);
-    } elseif (request()->routeIs('services.show') && isset($service) && is_object($service) && !empty($service->image_path ?? null)) {
-    $ogImage = asset('storage/' . $service->image_path);
-    } elseif (request()->routeIs('projects.show') && isset($project) && is_object($project) && !empty($project->main_image ?? null)) {
-    $ogImage = asset('storage/' . $project->main_image);
+    $resolvedMetaImage = $meta_image ?? ($sectionMetaImage !== '' ? $sectionMetaImage : null);
+    if (!empty($resolvedMetaImage) && is_string($resolvedMetaImage)) {
+    if (Str::startsWith($resolvedMetaImage, ['http://', 'https://'])) {
+    $resolvedMetaImage = $resolvedMetaImage;
+    } elseif (Str::startsWith($resolvedMetaImage, '/')) {
+    $resolvedMetaImage = url($resolvedMetaImage);
+    } else {
+    $resolvedMetaImage = asset($resolvedMetaImage);
     }
+    }
+
+    $primaryOgImage = $siteLogoImage;
+
+    if (!empty($resolvedMetaImage)) {
+    $primaryOgImage = $resolvedMetaImage;
+    } elseif (request()->routeIs('blog.show') && isset($post) && is_object($post) && !empty($post->image_path ?? null)) {
+    $primaryOgImage = asset('storage/' . $post->image_path);
+    } elseif (request()->routeIs('services.show') && isset($service) && is_object($service) && !empty($service->image_path ?? null)) {
+    $primaryOgImage = asset('storage/' . $service->image_path);
+    } elseif (request()->routeIs('projects.show') && isset($project) && is_object($project) && !empty($project->main_image ?? null)) {
+    $primaryOgImage = asset('storage/' . $project->main_image);
+    }
+
+    $fallbackOgImage = $primaryOgImage !== $siteLogoImage ? $siteLogoImage : null;
+
+    $resolveOgImageType = function (?string $url): ?string {
+    if (empty($url)) return null;
+    $path = parse_url($url, PHP_URL_PATH) ?: $url;
+    $ext = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+    return match ($ext) {
+    'webp' => 'image/webp',
+    'png' => 'image/png',
+    'jpg', 'jpeg' => 'image/jpeg',
+    'gif' => 'image/gif',
+    default => null,
+    };
+    };
+
+    $primaryOgImageType = $resolveOgImageType($primaryOgImage);
+    $fallbackOgImageType = $resolveOgImageType($fallbackOgImage);
     @endphp
-    <meta property="og:image" content="{{ $ogImage }}">
+    <meta property="og:image" content="{{ $primaryOgImage }}">
+    <meta property="og:image:secure_url" content="{{ $primaryOgImage }}">
+    @if (!empty($primaryOgImageType))
+    <meta property="og:image:type" content="{{ $primaryOgImageType }}">
+    @endif
+    <meta property="og:image:alt" content="{{ $resolvedMetaTitle ?? ($settings['site_name'] ?? config('app.name')) }}">
+    @if (!empty($fallbackOgImage))
+    <meta property="og:image" content="{{ $fallbackOgImage }}">
+    <meta property="og:image:secure_url" content="{{ $fallbackOgImage }}">
+    @if (!empty($fallbackOgImageType))
+    <meta property="og:image:type" content="{{ $fallbackOgImageType }}">
+    @endif
+    <meta property="og:image:alt" content="{{ $settings['site_name'] ?? config('app.name') }}">
+    @endif
 
     <meta property="og:locale" content="ar_SA">
     <meta property="og:site_name" content="{{ $settings['site_name'] ?? config('app.name') }}">
@@ -127,7 +186,8 @@
     <meta name="twitter:description" content="{{ Str::limit($resolvedMetaDescription, 160) }}">
     @endif
 
-    <meta name="twitter:image" content="{{ $ogImage }}">
+    <meta name="twitter:image" content="{{ $primaryOgImage }}">
+    <meta name="twitter:image:alt" content="{{ $resolvedMetaTitle ?? ($settings['site_name'] ?? config('app.name')) }}">
 
     <link rel="icon" type="image/x-icon"
         href="{{ isset($settings['site_favicon']) ? asset('storage/' . $settings['site_favicon']) : asset('assets/img/favicon.ico') }}">
@@ -143,8 +203,11 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap"
         rel="stylesheet">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     @if (request()->routeIs('home'))
-    <link rel="preload" as="image" href="{{ asset('assets/img/hero.webp') }}" fetchpriority="high">
+    <link rel="preload" as="image" href="{{ asset('assets/img/hero.webp') }}"
+        imagesrcset="{{ asset('assets/img/hero11.webp') }} 640w, {{ asset('assets/img/hero.webp') }} 1600w"
+        imagesizes="100vw" fetchpriority="high" type="image/webp">
     @endif
 
     <!-- Scripts -->

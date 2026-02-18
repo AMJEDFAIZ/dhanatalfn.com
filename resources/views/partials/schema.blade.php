@@ -361,6 +361,69 @@ $addToGraph([
 }
 }
 
+elseif (request()->routeIs('keywords.show') && isset($keyword) && is_object($keyword)) {
+$addBreadcrumb($keyword->name, url()->current());
+
+$related = [];
+
+if (isset($items) && is_object($items) && method_exists($items, 'items')) {
+foreach ($items->items() as $it) {
+if (is_object($it)) {
+if (isset($it->image_path)) {
+$related[] = [
+"@type" => "Service",
+"name" => $it->title ?? '',
+"url" => isset($it->slug) ? route('services.show', $it->slug) : url()->current()
+];
+} elseif (isset($it->main_image)) {
+$related[] = [
+"@type" => "CreativeWork",
+"name" => $it->title ?? '',
+"url" => isset($it->slug) ? route('projects.show', $it->slug) : url()->current()
+];
+} else {
+$related[] = [
+"@type" => "BlogPosting",
+"headline" => $it->title ?? '',
+"url" => isset($it->slug) ? route('blog.show', $it->slug) : url()->current()
+];
+}
+}
+}
+} else {
+if (isset($services)) {
+foreach ($services as $svc) {
+if (is_object($svc) && isset($svc->slug)) {
+$related[] = ["@type" => "Service", "name" => $svc->title ?? '', "url" => route('services.show', $svc->slug)];
+}
+}
+}
+if (isset($projects)) {
+foreach ($projects as $prj) {
+if (is_object($prj) && isset($prj->slug)) {
+$related[] = ["@type" => "CreativeWork", "name" => $prj->title ?? '', "url" => route('projects.show', $prj->slug)];
+}
+}
+}
+if (isset($posts)) {
+foreach ($posts as $bp) {
+if (is_object($bp) && isset($bp->slug)) {
+$related[] = ["@type" => "BlogPosting", "headline" => $bp->title ?? '', "url" => route('blog.show', $bp->slug)];
+}
+}
+}
+}
+
+$addToGraph([
+"@type" => "CollectionPage",
+"name" => $keyword->name . ' - ' . $siteName,
+"url" => url()->current(),
+"description" => !empty($keyword->description) ? strip_tags((string) $keyword->description) : ('كل ما يتعلق بـ ' . $keyword->name . ' من خدمات ومشاريع ومقالات.'),
+"about" => ["@type" => "Thing", "name" => $keyword->name],
+"hasPart" => $related
+]);
+}
+
 // --- صفحات ثابتة (Static Pages) ---
 elseif (request()->routeIs('about')) {
 $addBreadcrumb($settings['about_meta_title'] ?? "من نحن", route('about'));
@@ -397,5 +460,5 @@ $addToGraph([
 @endphp
 
 <script type="application/ld+json">
-    {!!json_encode($schema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) !!}
+    {!!json_encode($schema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT)!!}
 </script>

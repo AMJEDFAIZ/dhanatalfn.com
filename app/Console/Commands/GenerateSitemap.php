@@ -15,6 +15,7 @@ use App\Models\Service;
 use App\Models\Project;
 use App\Models\BlogPost;
 use App\Models\Setting;
+use App\Models\Keyword;
 
 class GenerateSitemap extends Command
 {
@@ -300,6 +301,24 @@ class GenerateSitemap extends Command
                     }
                 });
         }
+
+        if (class_exists(Keyword::class) && Route::has('keywords.show')) {
+            $this->info('Adding Keywords...');
+            Keyword::where('active', true)
+                ->withCount(['services', 'projects', 'blogPosts', 'seoPages'])
+                ->chunk(200, function ($keywords) {
+                    foreach ($keywords as $keyword) {
+                        $usage = (int) ($keyword->services_count ?? 0)
+                            + (int) ($keyword->projects_count ?? 0)
+                            + (int) ($keyword->blog_posts_count ?? 0)
+                            + (int) ($keyword->seo_pages_count ?? 0);
+                        if ($usage < 2 && empty($keyword->description)) {
+                            continue;
+                        }
+                        $this->addItemToSitemap($keyword, 'keywords.show', 0.4, 'weekly');
+                    }
+                });
+        }
     }
 
     /**
@@ -315,8 +334,8 @@ class GenerateSitemap extends Command
         $lastMod = $model->updated_at ?? $model->published_at ?? $model->created_at ?? now();
 
         // Title & Description
-        $title = $model->meta_title ?? $model->title ?? '';
-        $description = $model->meta_description ?? $model->description ?? '';
+        $title = $model->meta_title ?? $model->title ?? $model->name ?? '';
+        $description = $model->meta_description ?? $model->description ?? $model->content ?? '';
 
         // Process Images
         $images = $this->getImagesFromModel($model);

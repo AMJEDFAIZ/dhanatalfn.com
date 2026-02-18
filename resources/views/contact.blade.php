@@ -13,7 +13,10 @@ collect([$settings['site_name'] ?? null, 'تواصل معنا', 'تواصل', '�
 <!-- Page Hero -->
 <section class="relative h-[40vh] min-h-[300px] flex items-center justify-center overflow-hidden">
     <div class="absolute inset-0 z-0">
-        <img src="{{ asset('assets/img/hero.webp') }}" alt="تواصل معنا " class="w-full h-full object-cover">
+        <img src="{{ asset('assets/img/hero.webp') }}"
+            srcset="{{ asset('assets/img/hero11.webp') }} 640w, {{ asset('assets/img/hero.webp') }} 1600w"
+            sizes="100vw" alt="تواصل معنا " class="w-full h-full object-cover" loading="eager" fetchpriority="high"
+            decoding="async">
         <div class="absolute inset-0 bg-primary/80 mix-blend-multiply"></div>
     </div>
 

@@ -14,9 +14,12 @@
     <div class="absolute inset-0 z-0">
         @if ($project->main_image)
         <img src="{{ asset('storage/' . $project->main_image) }}" alt="{{ $project->title }}"
-            class="w-full h-full object-cover" loading="lazy" decoding="async">
+            class="w-full h-full object-cover" loading="eager" fetchpriority="high" decoding="async">
         @else
-        <img src="{{ asset('assets/img/hero.webp') }}" alt="معلم بوية جدة" class="w-full h-full object-cover" loading="lazy" accesskey="">
+        <img src="{{ asset('assets/img/hero.webp') }}"
+            srcset="{{ asset('assets/img/hero11.webp') }} 640w, {{ asset('assets/img/hero.webp') }} 1600w"
+            sizes="100vw" alt="معلم بوية جدة" class="w-full h-full object-cover" loading="eager" fetchpriority="high"
+            decoding="async">
         @endif
         <div class="absolute inset-0 bg-primary/60 mix-blend-multiply"></div>
     </div>

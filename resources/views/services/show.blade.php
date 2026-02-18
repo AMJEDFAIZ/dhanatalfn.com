@@ -15,10 +15,12 @@
     <div class="absolute inset-0 z-0">
         @if ($service->image_path)
         <img src="{{ asset('storage/' . $service->image_path) }}" alt="{{ $service->title }}"
-            class="w-full h-full " loading="lazy" decoding="async">
+            class="w-full h-full object-cover" loading="eager" fetchpriority="high" decoding="async">
         @else
-        <img src="{{ asset('assets/img/hero.webp') }}" alt="معلم دهانات وديكورات جدة ت: 0532791522"
-            class="w-full h-full object-cover">
+        <img src="{{ asset('assets/img/hero.webp') }}"
+            srcset="{{ asset('assets/img/hero11.webp') }} 640w, {{ asset('assets/img/hero.webp') }} 1600w"
+            sizes="100vw" alt="معلم دهانات وديكورات جدة ت: 0532791522" class="w-full h-full object-cover"
+            loading="eager" fetchpriority="high" decoding="async">
         @endif
         <div class="absolute inset-0 bg-primary/60 mix-blend-multiply"></div>
     </div>

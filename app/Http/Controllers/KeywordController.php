@@ -18,6 +18,7 @@ class KeywordController extends Controller
         $robots_noindex = $usage < 2 && empty($keyword->description);
 
         $type = $request->string('type')->trim()->toString();
+        $robots_noindex = $robots_noindex || $type !== '';
         $items = null;
         $services = collect();
         $projects = collect();
@@ -53,4 +54,3 @@ class KeywordController extends Controller
         ));
     }
 }
-

@@ -13,7 +13,10 @@
 <!--  Hero -->
 <section class="relative h-[40vh] min-h-[300px] flex items-center justify-center overflow-hidden">
     <div class="absolute inset-0 z-0">
-        <img src="{{ asset('assets/img/hero.webp') }}" alt="من نـحـن" class="w-full h-full object-cover">
+        <img src="{{ asset('assets/img/hero.webp') }}"
+            srcset="{{ asset('assets/img/hero11.webp') }} 640w, {{ asset('assets/img/hero.webp') }} 1600w"
+            sizes="100vw" alt="من نـحـن" class="w-full h-full object-cover" loading="eager" fetchpriority="high"
+            decoding="async">
         <div class="absolute inset-0 bg-primary/80 mix-blend-multiply"></div>
     </div>
 
@@ -39,7 +42,9 @@
         <div class="flex flex-col lg:flex-row items-center gap-12">
             <div class="w-full lg:w-1/2 reveal animate-fade-in-up">
                 <div class="relative w-full max-w-[580px] aspect-[580/422] rounded-2xl overflow-hidden shadow-2xl">
-                    <img src="{{ asset('assets/img/hero.webp') }}" alt="About Us" loading="lazy" decoding="async"
+                    <img src="{{ asset('assets/img/hero.webp') }}"
+                        srcset="{{ asset('assets/img/hero11.webp') }} 640w, {{ asset('assets/img/hero.webp') }} 1600w"
+                        sizes="(max-width: 1024px) 100vw, 580px" alt="About Us" loading="lazy" decoding="async"
                         class="w-full h-full object-cover">
                     <div class="absolute inset-0 bg-primary/10"></div>
                 </div>

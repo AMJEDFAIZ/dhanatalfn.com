@@ -5,7 +5,7 @@
 <section class="relative h-[50vh] min-h-[400px] flex items-center justify-center overflow-hidden">
     <div class="absolute inset-0 z-0">
         <img src="{{ asset('storage/' . $post->image_path) }}" alt="{{ $post->title }}"
-            class="w-full h-full object-cover" loading="lazy" decoding="async">
+            class="w-full h-full object-cover" loading="eager" fetchpriority="high" decoding="async">
         <div class="absolute inset-0 bg-gradient-to-t from-primary/90 to-primary/40"></div>
     </div>
 

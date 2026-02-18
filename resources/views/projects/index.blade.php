@@ -15,7 +15,10 @@ collect([$settings['site_name'] ?? null, 'مشاريعنا', 'مشاريع', 'ا
 <!-- Page Hero -->
 <section class="relative h-[40vh] min-h-[350px] flex items-center justify-center overflow-hidden">
     <div class="absolute inset-0 z-0">
-        <img src="{{ asset('assets/img/hero.webp') }}" alt="معلم دهانات وديكورات جدة حي الروضة" class="w-full h-full object-cover" loading="lazy" decoding="async">
+        <img src="{{ asset('assets/img/hero.webp') }}"
+            srcset="{{ asset('assets/img/hero11.webp') }} 640w, {{ asset('assets/img/hero.webp') }} 1600w"
+            sizes="100vw" alt="معلم دهانات وديكورات جدة حي الروضة" class="w-full h-full object-cover"
+            loading="eager" fetchpriority="high" decoding="async">
         <div class="absolute inset-0 bg-primary/70 mix-blend-multiply"></div>
     </div>
 

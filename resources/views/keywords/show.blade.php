@@ -8,7 +8,10 @@
 @section('content')
 <section class="relative h-[35vh] min-h-[280px] flex items-center justify-center overflow-hidden">
     <div class="absolute inset-0 z-0">
-        <img src="{{ asset('assets/img/hero.webp') }}" alt="{{ $keyword->name }}" class="w-full h-full object-cover">
+        <img src="{{ asset('assets/img/hero.webp') }}"
+            srcset="{{ asset('assets/img/hero11.webp') }} 640w, {{ asset('assets/img/hero.webp') }} 1600w"
+            sizes="100vw" alt="{{ $keyword->name }}" class="w-full h-full object-cover" loading="eager"
+            fetchpriority="high" decoding="async">
         <div class="absolute inset-0 bg-primary/80 mix-blend-multiply"></div>
     </div>
 
