@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\BlogPost;
 use App\Models\Keyword;
 use App\Services\KeywordService;
+use App\Services\MediaFilenameService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -59,11 +60,11 @@ class BlogController extends Controller
 
         if ($request->hasFile('image')) {
             // عمل سلاج مؤقت لتسمية الصورة بحسب العنوان
-            $tempslug = Str::slug($request->title);
+            $mediaFilename = app(MediaFilenameService::class);
             $manager = new ImageManager(new Driver());
             $image = $manager->read($request->file('image'));
             $image->scaleDown(900);
-            $imagename = $tempslug . "-" . time() . ".webp";
+            $imagename = $mediaFilename->uniqueWebpFilename('blog', (string) $request->title, 'blog');
 
             $image->toWebp(70)->save(storage_path("app/public/blog/" . $imagename));
 
@@ -187,11 +188,11 @@ class BlogController extends Controller
                 Storage::disk('public')->delete($blog->image_path);
             }
             // عمل سلاج مؤقت لتسمية الصورة بحسب العنوان
-            $tempslug = Str::slug($request->title);
+            $mediaFilename = app(MediaFilenameService::class);
             $manager = new ImageManager(new Driver());
             $image = $manager->read($request->file('image'));
             $image->scaleDown(900);
-            $imagename = $tempslug . "-" . time() . ".webp";
+            $imagename = $mediaFilename->uniqueWebpFilename('blog', (string) $request->title, 'blog');
 
             $image->toWebp(70)->save(storage_path("app/public/blog/" . $imagename));
 

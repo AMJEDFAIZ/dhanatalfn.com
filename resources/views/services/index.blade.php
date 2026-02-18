@@ -79,7 +79,7 @@ collect([$settings['site_name'] ?? null, 'خدماتنا', 'خدمات', 'الخ
 
                 <div class="p-8">
                     <h3 class="text-2xl font-bold text-primary mb-3 group-hover:text-accent transition-colors">
-                        <a href="{{ route('services.show', $service->slug) }}">
+                        <a href="{{ route('services.show', $service->slug) }}" title="{{ $service->title }}">
                             {{ $service->title }}
                         </a>
                     </h3>
@@ -88,7 +88,7 @@ collect([$settings['site_name'] ?? null, 'خدماتنا', 'خدمات', 'الخ
                         {{ Str::limit($service->description, 500) }}
                     </p>
 
-                    <a href="{{ route('services.show', $service->slug) }}"
+                    <a href="{{ route('services.show', $service->slug) }}" title="{{ $service->title }}"
                         class="inline-flex items-center text-primary font-bold hover:text-accent transition-colors">
                         اقرأ المزيد
                         <i

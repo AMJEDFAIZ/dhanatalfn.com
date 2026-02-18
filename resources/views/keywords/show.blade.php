@@ -18,7 +18,7 @@
     <div class="container mx-auto px-4 relative z-10 text-center pt-20">
         <h1 class="text-3xl md:text-5xl font-bold mb-3 animate-fade-in-up text-accent">{{ $keyword->name }}</h1>
         <nav class="flex justify-center items-center gap-2 text-sm md:text-base text-gray-300 animate-fade-in-up animation-delay-200">
-            <a href="{{ route('home') }}" class="hover:text-white transition-colors">الرئيسية</a>
+            <a href="{{ route('home') }}" title="العودة إلى الرئيسية" class="hover:text-white transition-colors">الرئيسية</a>
             <span>/</span>
             <span class="text-accent/4 transition-colors py-1 relative after:absolute after:bottom-0 after:right-0 after:w-full after:h-0.5 after:bg-accent after:transition-all">
                 {{ $keyword->name }}
@@ -36,19 +36,19 @@
         @endif
 
         <div class="flex flex-wrap gap-2 mb-8">
-            <a href="{{ route('keywords.show', $keyword->slug) }}"
+            <a href="{{ route('keywords.show', $keyword->slug) }}" title="عرض كل العناصر المرتبطة بـ {{ $keyword->name }}"
                 class="px-4 py-2 rounded-full text-sm font-bold border transition-colors {{ $type === '' ? 'bg-primary text-white border-primary' : 'bg-white text-primary border-gray-200 hover:bg-gray-100' }}">
                 الكل
             </a>
-            <a href="{{ route('keywords.show', [$keyword->slug, 'type' => 'services']) }}"
+            <a href="{{ route('keywords.show', [$keyword->slug, 'type' => 'services']) }}" title="عرض خدمات مرتبطة بـ {{ $keyword->name }}"
                 class="px-4 py-2 rounded-full text-sm font-bold border transition-colors {{ $type === 'services' ? 'bg-primary text-white border-primary' : 'bg-white text-primary border-gray-200 hover:bg-gray-100' }}">
                 الخدمات ({{ (int) $keyword->services_count }})
             </a>
-            <a href="{{ route('keywords.show', [$keyword->slug, 'type' => 'projects']) }}"
+            <a href="{{ route('keywords.show', [$keyword->slug, 'type' => 'projects']) }}" title="عرض مشاريع مرتبطة بـ {{ $keyword->name }}"
                 class="px-4 py-2 rounded-full text-sm font-bold border transition-colors {{ $type === 'projects' ? 'bg-primary text-white border-primary' : 'bg-white text-primary border-gray-200 hover:bg-gray-100' }}">
                 المشاريع ({{ (int) $keyword->projects_count }})
             </a>
-            <a href="{{ route('keywords.show', [$keyword->slug, 'type' => 'blog']) }}"
+            <a href="{{ route('keywords.show', [$keyword->slug, 'type' => 'blog']) }}" title="عرض مقالات مرتبطة بـ {{ $keyword->name }}"
                 class="px-4 py-2 rounded-full text-sm font-bold border transition-colors {{ $type === 'blog' ? 'bg-primary text-white border-primary' : 'bg-white text-primary border-gray-200 hover:bg-gray-100' }}">
                 المدونة ({{ (int) $keyword->blog_posts_count }})
             </a>
@@ -58,7 +58,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             @foreach ($items as $item)
             @if ($type === 'services')
-            <a href="{{ route('services.show', $item->slug) }}" class="group bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-all">
+            <a href="{{ route('services.show', $item->slug) }}" title="{{ $item->title }}" class="group bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-all">
                 <div class="relative w-full aspect-[16/10] bg-gray-100 overflow-hidden">
                     @if (!empty($item->image_path))
                     <img src="{{ asset('storage/' . $item->image_path) }}" alt="{{ $item->title }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" loading="lazy" decoding="async">
@@ -74,7 +74,7 @@
                 </div>
             </a>
             @elseif ($type === 'projects')
-            <a href="{{ route('projects.show', $item->slug) }}" class="group bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-all">
+            <a href="{{ route('projects.show', $item->slug) }}" title="{{ $item->title }}" class="group bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-all">
                 <div class="relative w-full aspect-[16/10] bg-gray-100 overflow-hidden">
                     @if (!empty($item->main_image))
                     <img src="{{ asset('storage/' . $item->main_image) }}" alt="{{ $item->title }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" loading="lazy" decoding="async">
@@ -90,7 +90,7 @@
                 </div>
             </a>
             @else
-            <a href="{{ route('blog.show', $item->slug) }}" class="group bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-all">
+            <a href="{{ route('blog.show', $item->slug) }}" title="{{ $item->title }}" class="group bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-all">
                 <div class="relative w-full aspect-[16/10] bg-gray-100 overflow-hidden">
                     @if (!empty($item->image_path))
                     <img src="{{ asset('storage/' . $item->image_path) }}" alt="{{ $item->title }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" loading="lazy" decoding="async">
@@ -116,11 +116,11 @@
         <div class="mb-10">
             <div class="flex justify-between items-end mb-4">
                 <div class="text-xl font-bold text-primary">الخدمات</div>
-                <a href="{{ route('keywords.show', [$keyword->slug, 'type' => 'services']) }}" class="text-accent font-bold hover:underline">عرض الكل</a>
+                <a href="{{ route('keywords.show', [$keyword->slug, 'type' => 'services']) }}" title="عرض كل الخدمات المرتبطة بـ {{ $keyword->name }}" class="text-accent font-bold hover:underline">عرض الكل</a>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 @foreach ($services as $item)
-                <a href="{{ route('services.show', $item->slug) }}" class="group bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-all">
+                <a href="{{ route('services.show', $item->slug) }}" title="{{ $item->title }}" class="group bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-all">
                     <div class="relative w-full aspect-[16/10] bg-gray-100 overflow-hidden">
                         @if (!empty($item->image_path))
                         <img src="{{ asset('storage/' . $item->image_path) }}" alt="{{ $item->title }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" loading="lazy" decoding="async">
@@ -144,11 +144,11 @@
         <div class="mb-10">
             <div class="flex justify-between items-end mb-4">
                 <div class="text-xl font-bold text-primary">المشاريع</div>
-                <a href="{{ route('keywords.show', [$keyword->slug, 'type' => 'projects']) }}" class="text-accent font-bold hover:underline">عرض الكل</a>
+                <a href="{{ route('keywords.show', [$keyword->slug, 'type' => 'projects']) }}" title="عرض كل المشاريع المرتبطة بـ {{ $keyword->name }}" class="text-accent font-bold hover:underline">عرض الكل</a>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 @foreach ($projects as $item)
-                <a href="{{ route('projects.show', $item->slug) }}" class="group bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-all">
+                <a href="{{ route('projects.show', $item->slug) }}" title="{{ $item->title }}" class="group bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-all">
                     <div class="relative w-full aspect-[16/10] bg-gray-100 overflow-hidden">
                         @if (!empty($item->main_image))
                         <img src="{{ asset('storage/' . $item->main_image) }}" alt="{{ $item->title }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" loading="lazy" decoding="async">
@@ -172,11 +172,11 @@
         <div class="mb-2">
             <div class="flex justify-between items-end mb-4">
                 <div class="text-xl font-bold text-primary">المدونة</div>
-                <a href="{{ route('keywords.show', [$keyword->slug, 'type' => 'blog']) }}" class="text-accent font-bold hover:underline">عرض الكل</a>
+                <a href="{{ route('keywords.show', [$keyword->slug, 'type' => 'blog']) }}" title="عرض كل مقالات المدونة المرتبطة بـ {{ $keyword->name }}" class="text-accent font-bold hover:underline">عرض الكل</a>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 @foreach ($posts as $item)
-                <a href="{{ route('blog.show', $item->slug) }}" class="group bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-all">
+                <a href="{{ route('blog.show', $item->slug) }}" title="{{ $item->title }}" class="group bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-all">
                     <div class="relative w-full aspect-[16/10] bg-gray-100 overflow-hidden">
                         @if (!empty($item->image_path))
                         <img src="{{ asset('storage/' . $item->image_path) }}" alt="{{ $item->title }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" loading="lazy" decoding="async">

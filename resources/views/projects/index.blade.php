@@ -69,7 +69,7 @@ collect([$settings['site_name'] ?? null, 'مشاريعنا', 'مشاريع', 'ا
                     class="absolute inset-0 bg-gradient-to-t from-primary/90 to-transparent duration-300 flex flex-col justify-end p-6 pointer-events-none">
 
                     <h3 class="text-white text-xl hover:text-accent font-bold mb-1">
-                        <a href="{{ route('projects.show', $project->slug) }}" class="pointer-events-auto">
+                        <a href="{{ route('projects.show', $project->slug) }}" title="{{ $project->title }}" class="pointer-events-auto">
                             {{ $project->title }}
                         </a>
                     </h3>
@@ -78,7 +78,7 @@ collect([$settings['site_name'] ?? null, 'مشاريعنا', 'مشاريع', 'ا
                         {{ Str::limit($project->description, 250) }}
                     </p>
 
-                    <a href="{{ route('projects.show', $project->slug) }}"
+                    <a href="{{ route('projects.show', $project->slug) }}" title="{{ $project->title }}"
                         class="inline-block bg-accent text-primary text-sm font-bold px-4 py-2 rounded hover:bg-secondary hover:text-accent transition w-fit pointer-events-auto">
                         المزيد من التفاصيل
                         <i class="fa-solid fa-arrow-left text-sm"></i>

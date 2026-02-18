@@ -7,6 +7,7 @@ use App\Models\Project;
 use App\Models\Service;
 use App\Models\Keyword;
 use App\Services\KeywordService;
+use App\Services\MediaFilenameService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -69,11 +70,11 @@ class ProjectController extends Controller
 
             // $slug =$request->slug?$request->slug: Str::slug($request->title) ;
             // عمل سلاج مؤقت لتسمية الصورة بحسب العنوان
-            $tempslug = Str::slug($request->title);
+            $mediaFilename = app(MediaFilenameService::class);
             $manager = new ImageManager(new Driver());
             $image = $manager->read($request->file('main_image'));
             $image->scaleDown(900);
-            $imagename = $tempslug . "-" . time() . ".webp";
+            $imagename = $mediaFilename->uniqueWebpFilename('projects', (string) $request->title, 'project');
 
             $image->toWebp(70)->save(storage_path("app/public/projects/" . $imagename));
 
@@ -195,11 +196,11 @@ class ProjectController extends Controller
 
         if ($request->hasFile('main_image')) {
             // عمل سلاج مؤقت لتسمية الصورة بحسب العنوان
-            $tempslug = Str::slug($request->title);
+            $mediaFilename = app(MediaFilenameService::class);
             $manager = new ImageManager(new Driver());
             $image = $manager->read($request->file('main_image'));
             $image->scaleDown(900);
-            $imagename = $tempslug . "-" . time() . ".webp";
+            $imagename = $mediaFilename->uniqueWebpFilename('projects', (string) $request->title, 'project');
 
             $image->toWebp(70)->save(storage_path("app/public/projects/" . $imagename));
 

@@ -111,7 +111,7 @@
                                     @endif
                                     <div
                                         class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                                        <a href="{{ route('projects.show', $project->slug) }}"
+                                        <a href="{{ route('projects.show', $project->slug) }}" title="{{ $project->title }}"
                                             class="bg-primary text-white px-4 py-2 rounded-full text-sm font-bold transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
                                             عرض التفاصيل
                                         </a>
@@ -121,7 +121,9 @@
                                     <h4
                                         class="font-bold text-lg mb-2 text-gray-800 group-hover:text-primary transition-colors">
                                         <a
-                                            href="{{ route('projects.show', $project->slug) }}">{{ $project->title }}</a>
+                                            href="{{ route('projects.show', $project->slug) }}" title="{{ $project->title }}">
+                                            {{ $project->title }}
+                                        </a>
                                     </h4>
                                     <p class="text-gray-600 text-sm line-clamp-2">
                                         {{ Str::limit(strip_tags($project->description), 100) }}
@@ -189,7 +191,7 @@
                             $isActive = request()->route('slug') == $serviceItem->slug;
                             @endphp
 
-                            <a href="{{ route('services.show', $serviceItem->slug) }}"
+                            <a href="{{ route('services.show', $serviceItem->slug) }}" title="{{ $serviceItem->title }}"
                                 class="group flex items-center gap-3 p-3 rounded-lg shadow-sm transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40
                                   {{ $isActive ? 'bg-white text-accent border-r-4 border-accent pointer-events-none' : 'bg-white text-gray-700 hover:bg-accent hover:text-white' }}">
                                 <div class="shrink-0 w-14 h-14 rounded-lg overflow-hidden bg-gray-100 ring-1 ring-gray-200">

@@ -217,12 +217,13 @@
                 class="mt-12 pt-8 border-t  border-gray-200 flex flex-col md:flex-row justify-between items-center gap-6">
 
                 <div class="flex gap-2 flex-wrap">
-                    @if (isset($contentKeywords))
-                    <span class="text-accent font-bold uppercase tracking-wider block mb-2">كلمات
-                        مفتاحية:</span>
-                    @include('partials.keyword-tags', ['keywords' => $contentKeywords])
-                    @endif
-                </div>
+                        @if (isset($contentKeywords))
+                        <span class="text-accent font-bold uppercase tracking-wider block mb-2">كلمات
+                            مفتاحية:</span>
+                        @include('partials.keyword-tags', ['keywords' => $contentKeywords])
+                        @endif
+                        {{-- @include('partials.keyword-tags', ['keywords' => $contentKeywords]) --}}
+                    </div>
                 <div class="flex gap-4">
                     <span class="text-gray-500 font-bold ml-2">مشاركة:</span>
                     {{-- روابط مشاركة حقيقية --}}
@@ -253,7 +254,7 @@
                     <div
                         class="gallery-item group relative h-64 rounded-xl overflow-hidden shadow-md cursor-zoom-in">
                         <img src="{{ asset('storage/' . $image->image_path) }}"
-                            alt="{{ $image->title }} - صورة {{ $loop->iteration }}"
+                            alt="{{ $image->title }}"
                             class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" loading="lazy" decoding="async">
 
                         <div

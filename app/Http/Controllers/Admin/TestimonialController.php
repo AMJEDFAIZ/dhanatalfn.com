@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Testimonial;
+use App\Services\MediaFilenameService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -40,12 +41,12 @@ class TestimonialController extends Controller
 
         if ($request->hasFile('image_path')) {
 
-               // عمل سلاج مؤقت لتسمية الصورة بحسب العنوان
-            $tempslug = Str::slug($request->client_name);
+            // عمل سلاج مؤقت لتسمية الصورة بحسب العنوان
+            $mediaFilename = app(MediaFilenameService::class);
             $manager = new ImageManager(new Driver());
             $image = $manager->read($request->file('image_path'));
             $image->scaleDown(900);
-            $imagename = $tempslug . "-" . time() . ".webp";
+            $imagename = $mediaFilename->uniqueWebpFilename('testimonials', (string) $request->client_name, 'testimonial');
 
             $image->toWebp(70)->save(storage_path("app/public/testimonials/" . $imagename));
 
@@ -87,12 +88,12 @@ class TestimonialController extends Controller
                 Storage::disk('public')->delete($testimonial->image_path);
             }
 
-               // عمل سلاج مؤقت لتسمية الصورة بحسب العنوان
-            $tempslug = Str::slug($request->client_name);
+            // عمل سلاج مؤقت لتسمية الصورة بحسب العنوان
+            $mediaFilename = app(MediaFilenameService::class);
             $manager = new ImageManager(new Driver());
             $image = $manager->read($request->file('image_path'));
             $image->scaleDown(900);
-            $imagename = $tempslug . "-" . time() . ".webp";
+            $imagename = $mediaFilename->uniqueWebpFilename('testimonials', (string) $request->client_name, 'testimonial');
 
             $image->toWebp(70)->save(storage_path("app/public/testimonials/" . $imagename));
 

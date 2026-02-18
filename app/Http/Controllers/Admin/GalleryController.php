@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\GalleryImage;
 use App\Models\Project;
+use App\Services\MediaFilenameService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\ImageManager;
@@ -46,19 +47,14 @@ class GalleryController extends Controller
             'sort_order' => 'integer',
         ]);
 
-        // slug مؤقت لاسم الملف
-        $baseName = $validated['title']
-            ? Str::slug($validated['title'])
-            : 'gallery-image';
+        $mediaFilename = app(MediaFilenameService::class);
+        $imageName = $mediaFilename->uniqueWebpFilename('gallery', (string) ($validated['title'] ?? ''), 'gallery-image');
 
         $manager = new ImageManager(new Driver());
         $image   = $manager->read($request->file('image'));
 
         // تصغير
         $image->scaleDown(900);
-
-        // اسم الصورة
-        $imageName = $baseName . '-' . time() . '.webp';
 
         // حفظ WebP مضغوط
         $image->toWebp(70)->save(
@@ -111,17 +107,14 @@ class GalleryController extends Controller
                 Storage::disk('public')->delete($gallery->image_path);
             }
 
-            $baseName = $validated['title']
-                ? Str::slug($validated['title'])
-                : 'gallery-image';
+            $mediaFilename = app(MediaFilenameService::class);
+            $imageName = $mediaFilename->uniqueWebpFilename('gallery', (string) ($validated['title'] ?? ''), 'gallery-image');
 
 
             $manager = new ImageManager(new Driver());
             $image   = $manager->read($request->file('image'));
 
             $image->scaleDown(900);
-
-            $imageName = $baseName . '-' . time() . '.webp';
 
             $image->toWebp(70)->save(
                 storage_path('app/public/gallery/' . $imageName)

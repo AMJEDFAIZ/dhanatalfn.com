@@ -7,6 +7,7 @@ use App\Models\Service;
 use App\Models\Project;
 use App\Models\Keyword;
 use App\Services\KeywordService;
+use App\Services\MediaFilenameService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -65,12 +66,12 @@ class ServiceController extends Controller
 
         if ($request->hasFile('image')) {
 
-            $tempslug = Str::slug($request->title);
+            $mediaFilename = app(MediaFilenameService::class);
             $manager = new ImageManager(new Driver());
             $image = $manager->read($request->file('image'));
             $image->scaleDown(900);
 
-            $imagename = $tempslug . "-" . time() . ".webp";
+            $imagename = $mediaFilename->uniqueWebpFilename('services', (string) $request->title, 'service');
 
             $path = storage_path("app/public/services/{$imagename}");
 
@@ -199,12 +200,12 @@ class ServiceController extends Controller
 
         if ($request->hasFile('image')) {
 
-            $tempslug = Str::slug($request->title);
+            $mediaFilename = app(MediaFilenameService::class);
             $manager = new ImageManager(new Driver());
             $image = $manager->read($request->file('image'));
             $image->scaleDown(900);
 
-            $imagename = $tempslug . "-" . time() . ".webp";
+            $imagename = $mediaFilename->uniqueWebpFilename('services', (string) $request->title, 'service');
 
             $path = storage_path("app/public/services/{$imagename}");
 
