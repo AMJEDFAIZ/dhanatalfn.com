@@ -11,7 +11,7 @@ class KeywordsSeeder extends Seeder
     public function run(): void
     {
         $keywords = [
-            'اتصال معلم دهانات جدة',
+          /*   'اتصال معلم دهانات جدة',
             'اتصل معلم دهانات جدة',
             'استفسار دهانات جدة',
             'الاتصال',
@@ -155,7 +155,7 @@ class KeywordsSeeder extends Seeder
             'سعر المتر دهان داخلي جدة',
             'صباغ جدة',
             'ديكورات',
-            'دهانات وديكورات',
+            'دهانات وديكورات', */
         ];
 
         $keywords = collect($keywords)

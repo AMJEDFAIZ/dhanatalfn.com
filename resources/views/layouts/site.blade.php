@@ -5,60 +5,68 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    {{-- <!--         {{$meta_title ?? null ? $meta_title .' | '. ($settings['site_name'] ?? config('app.name', 'أفضل معلم دهانات وديكورات جدة')) : $settings['site_name'] ?? config('app.name', ' أفضل معلم دهانات وديكورات في جدة ') .' | '. ($page_title ?? 'الصفحة الرئيسية')}} --> --}}
+    {{--          {{$meta_title ?? null ? $meta_title .' | '. ($settings['site_name'] ?? config('app.name', 'أفضل معلم دهانات وديكورات جدة')) : $settings['site_name'] ?? config('app.name', ' أفضل معلم دهانات وديكورات في جدة ') .' | '. ($page_title ?? 'الصفحة الرئيسية')}} --}}
     @php
-    $sectionTitle = trim($__env->yieldContent('title'));
-    $sectionMetaTitle = trim($__env->yieldContent('meta_title'));
-    $sectionMetaDescription = trim($__env->yieldContent('meta_description'));
-    $sectionMetaKeywords = trim($__env->yieldContent('meta_keywords'));
+        $sectionTitle = trim($__env->yieldContent('title'));
+        $sectionMetaTitle = trim($__env->yieldContent('meta_title'));
+        $sectionMetaDescription = trim($__env->yieldContent('meta_description'));
+        $sectionMetaKeywords = trim($__env->yieldContent('meta_keywords'));
 
-    $resolvedMetaTitle = $meta_title ?? ($sectionMetaTitle !== '' ? $sectionMetaTitle : ($sectionTitle !== '' ? $sectionTitle : null));
-    $resolvedPageTitle = $page_title ?? ($sectionTitle !== '' ? $sectionTitle : null);
+        $resolvedMetaTitle =
+            $meta_title ??
+            ($sectionMetaTitle !== '' ? $sectionMetaTitle : ($sectionTitle !== '' ? $sectionTitle : null));
+        $resolvedPageTitle = $page_title ?? ($sectionTitle !== '' ? $sectionTitle : null);
 
-    $resolvedMetaDescription = $meta_description ?? ($sectionMetaDescription !== '' ? $sectionMetaDescription : null);
-    $resolvedMetaDescription = !empty($resolvedMetaDescription) ? preg_replace('/\s+/u', ' ', strip_tags((string) $resolvedMetaDescription)) : null;
+        $resolvedMetaDescription =
+            $meta_description ?? ($sectionMetaDescription !== '' ? $sectionMetaDescription : null);
+        $resolvedMetaDescription = !empty($resolvedMetaDescription)
+            ? preg_replace('/\s+/u', ' ', strip_tags((string) $resolvedMetaDescription))
+            : null;
 
-    if (!empty($meta_keywords ?? null)) {
-    $resolvedMetaKeywords = is_array($meta_keywords) ? implode(', ', $meta_keywords) : (string) $meta_keywords;
-    } elseif ($sectionMetaKeywords !== '') {
-    $resolvedMetaKeywords = (string) $sectionMetaKeywords;
-    } else {
-    $resolvedMetaKeywords = null;
-    }
-    $resolvedMetaKeywords = !empty($resolvedMetaKeywords) ? preg_replace('/\s+/u', ' ', strip_tags((string) $resolvedMetaKeywords)) : null;
+        if (!empty($meta_keywords ?? null)) {
+            $resolvedMetaKeywords = is_array($meta_keywords) ? implode(', ', $meta_keywords) : (string) $meta_keywords;
+        } elseif ($sectionMetaKeywords !== '') {
+            $resolvedMetaKeywords = (string) $sectionMetaKeywords;
+        } else {
+            $resolvedMetaKeywords = null;
+        }
+        $resolvedMetaKeywords = !empty($resolvedMetaKeywords)
+            ? preg_replace('/\s+/u', ' ', strip_tags((string) $resolvedMetaKeywords))
+            : null;
 
-    $meta_title = $resolvedMetaTitle;
-    $meta_description = $resolvedMetaDescription;
-    $meta_keywords = $resolvedMetaKeywords;
+        $meta_title = $resolvedMetaTitle;
+        $meta_description = $resolvedMetaDescription;
+        $meta_keywords = $resolvedMetaKeywords;
     @endphp
     <title>
-        {{$resolvedMetaTitle ? $resolvedMetaTitle .' | '. ($settings['site_name'] ?? config('app.name')) : ($settings['site_name'] ?? config('app.name')) .' | '. ($resolvedPageTitle ?? 'الصفحة الرئيسية')}}
+        {{ $resolvedMetaTitle ? $resolvedMetaTitle . ' | ' . ($settings['site_name'] ?? config('app.name')) : ($settings['site_name'] ?? config('app.name')) . ' | ' . ($resolvedPageTitle ?? 'الصفحة الرئيسية') }}
     </title>
     @if (!empty($resolvedMetaDescription))
-    <meta name="description" content="{{ Str::limit($resolvedMetaDescription, 160) }}">
+        <meta name="description" content="{{ Str::limit($resolvedMetaDescription, 160) }}">
     @endif
     @if (!empty($resolvedMetaKeywords))
-    <meta name="keywords" content="{{ $resolvedMetaKeywords }}">
+        <meta name="keywords" content="{{ $resolvedMetaKeywords }}">
     @endif
 
     @php
-    $canonicalUrl = url()->current();
-    $query = request()->query();
-    $canonicalParams = array_intersect_key($query, array_flip(['page']));
-    if (!empty($canonicalParams) && count($canonicalParams) === count($query)) {
-    $canonicalUrl = url()->current() . '?' . http_build_query($canonicalParams);
-    }
+        $canonicalUrl = url()->current();
+        $query = request()->query();
+        $canonicalParams = array_intersect_key($query, array_flip(['page']));
+        if (!empty($canonicalParams) && count($canonicalParams) === count($query)) {
+            $canonicalUrl = url()->current() . '?' . http_build_query($canonicalParams);
+        }
 
-    $robotsContent = 'index,follow, max-snippet:-1, max-video-preview:-1, max-image-preview:large';
-    if (request()->routeIs('blog.index') && request()->filled('search')) {
-    $robotsContent = 'noindex, follow, max-snippet:-1, max-video-preview:-1, max-image-preview:large';
-    }
-    if (!empty($robots_noindex ?? null)) {
-    $robotsContent = 'noindex, follow, max-snippet:-1, max-video-preview:-1, max-image-preview:large';
-    }
+        $robotsContent = 'index,follow, max-snippet:-1, max-video-preview:-1, max-image-preview:large';
+        if (request()->routeIs('blog.index') && request()->filled('search')) {
+            $robotsContent = 'noindex, follow, max-snippet:-1, max-video-preview:-1, max-image-preview:large';
+        }
+        if (!empty($robots_noindex ?? null)) {
+            $robotsContent = 'noindex, follow, max-snippet:-1, max-video-preview:-1, max-image-preview:large';
+        }
     @endphp
 
-    <meta name="author" content="{{ $settings['site_author'] ?? ($settings['site_name'] ?? 'معلم دهانات وديكورات جدة ت: 0532791522') }}">
+    <meta name="author"
+        content="{{ $settings['site_author'] ?? ($settings['site_name'] ?? 'معلم دهانات وديكورات جدة ت: 0532791522') }}">
     {{-- <meta name="robots" content="index, follow"> --}}
     <meta name="robots" content="{{ $robotsContent }}">
     <meta name="theme-color" content="#0A192F">
@@ -73,7 +81,7 @@
 
 
     @if (!empty($resolvedMetaDescription))
-    <meta property="og:description" content="{{ Str::limit($resolvedMetaDescription, 160) }}">
+        <meta property="og:description" content="{{ Str::limit($resolvedMetaDescription, 160) }}">
     @endif
 
 
@@ -81,22 +89,22 @@
     <meta property="og:type" content="website">
 
     @if (isset($settings['site_logo']))
-    <meta property="og:image" content="{{ asset('storage/' . $settings['site_logo']) }}">
+        <meta property="og:image" content="{{ asset('storage/' . $settings['site_logo']) }}">
     @else
-    <meta property="og:image" content="{{ asset('assets/img/icon.PNG') }}">
+        <meta property="og:image" content="{{ asset('assets/img/logo.png') }}">
     @endif
 
-    <meta property="og:locale" content="ar_AR">
+    <meta property="og:locale" content="ar_SA">
     <meta property="og:site_name" content="{{ $settings['site_name'] ?? config('app.name') }}">
     {{-- ===== Twitter Cards (ضروري لمنصة X) ===== --}}
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="{{ $resolvedMetaTitle ?? ($settings['site_name'] ?? config('app.name')) }}">
     @if (!empty($resolvedMetaDescription))
-    <meta name="twitter:description" content="{{ Str::limit($resolvedMetaDescription, 160) }}">
+        <meta name="twitter:description" content="{{ Str::limit($resolvedMetaDescription, 160) }}">
     @endif
 
     @if (isset($settings['site_logo']))
-    <meta name="twitter:image" content="{{ asset('storage/' . $settings['site_logo']) }}">
+        <meta name="twitter:image" content="{{ asset('storage/' . $settings['site_logo']) }}">
     @endif
 
     <link rel="icon" type="image/x-icon"
@@ -204,27 +212,28 @@
     <div class="fixed right-6 bottom-6 z-50 flex flex-col items-end gap-3 contact-wrapper">
         <!-- زر واتساب -->
         @if (isset($settings['whatsapp']))
-        <a href="{{ $settings['whatsapp'] }}" target="_blank" rel="noopener noreferrer"
-            aria-label="واتساب" title="واتساب"
-            class="contact-btn pulse pulse-delay-1 flex items-center justify-center bg-green-500 text-white rounded-full shadow-lg
+            <a href="{{ $settings['whatsapp'] }}" target="_blank" rel="noopener noreferrer" aria-label="واتساب"
+                title="واتساب"
+                class="contact-btn pulse pulse-delay-1 flex items-center justify-center bg-green-500 text-white rounded-full shadow-lg
                   w-12 h-12 md:w-14 md:h-14 transition-transform transform hover:scale-105
                   focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-400">
-            <i class="fa-brands fa-whatsapp text-lg md:text-xl" aria-hidden="true"></i>
-        </a>
+                <i class="fa-brands fa-whatsapp text-lg md:text-xl" aria-hidden="true"></i>
+            </a>
         @endif
 
         <!-- زر اتصال هاتفي -->
         @if (isset($settings['phone']))
-        <a href="tel:{{ $settings['phone'] }}" aria-label="اتصال هاتفي" title="اتصال"
-            class="contact-btn pulse pulse-delay-2 flex items-center justify-center bg-primary text-white rounded-full shadow-lg
+            <a href="tel:{{ $settings['phone'] }}" aria-label="اتصال هاتفي" title="اتصال"
+                class="contact-btn pulse pulse-delay-2 flex items-center justify-center bg-primary text-white rounded-full shadow-lg
                   w-12 h-12 md:w-14 md:h-14 transition-transform transform hover:scale-105
                   focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary/60">
-            <i class="fa-solid fa-phone text-lg md:text-xl" aria-hidden="true"></i>
-        </a>
+                <i class="fa-solid fa-phone text-lg md:text-xl" aria-hidden="true"></i>
+            </a>
         @endif
 
         <!-- زر إيميل (اختياري) -->
-        <!--@if (isset($settings['email']))-->
+        <!--@if (isset($settings['email']))
+-->
         <!--    <a href="mailto:{{ $settings['email'] }}" target="_blank" rel="noopener noreferrer"-->
         <!--       aria-label="بريد إلكتروني" title="بريد إلكتروني"-->
         <!--       class="contact-btn pulse pulse-delay-3 flex items-center justify-center bg-sky-600 text-white rounded-full shadow-lg-->
@@ -232,7 +241,8 @@
         <!--              focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-400">-->
         <!--        <i class="fa-solid fa-envelope text-lg md:text-xl" aria-hidden="true"></i>-->
         <!--    </a>-->
-        <!--@endif-->
+        <!--
+@endif-->
 
         <!-- أي أزرار إضافية ضعها هنا مع pulse-delay-4 ... -->
     </div>

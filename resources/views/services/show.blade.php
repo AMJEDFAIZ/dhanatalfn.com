@@ -15,9 +15,10 @@
     <div class="absolute inset-0 z-0">
         @if ($service->image_path)
         <img src="{{ asset('storage/' . $service->image_path) }}" alt="{{ $service->title }}"
-            class="w-full h-full object-cover">
+            class="w-full h-full " loading="lazy" decoding="async">
         @else
-        <img src="{{ asset('assets/img/hero.webp') }}" alt="معلم دهانات وديكورات جدة ت: 0532791522" class="w-full h-full object-cover">
+        <img src="{{ asset('assets/img/hero.webp') }}" alt="معلم دهانات وديكورات جدة ت: 0532791522"
+            class="w-full h-full object-cover">
         @endif
         <div class="absolute inset-0 bg-primary/60 mix-blend-multiply"></div>
     </div>
@@ -50,7 +51,7 @@
                 <div class="reveal">
                     @if ($service->image_path)
                     <img src="{{ asset('storage/' . $service->image_path) }}" alt="{{ $service->title }}"
-                        class="w-full  object-cover h-[400px] lg:h-[500px] rounded-xl shadow-lg mb-8">
+                        class="w-full  object-cover h-[400px] lg:h-[500px] rounded-xl shadow-lg mb-8" loading="lazy" decoding="async">
                     @endif {{-- object-cover --}}
                     @if ($service->title)
                     <h2 class="text-3xl font-bold text-accent mb-6">{{ $service->title }}</h2>
@@ -60,10 +61,15 @@
                         {!! nl2br(e($service->description)) !!}
                     </p>
                     <div
-                        class="mt-12 pt-8 border-t border-gray-100 flex flex-col md:flex-row justify-between items-center gap-6">
+                        class="mt-12 pt-8 border-t border-gray-200 flex flex-col md:flex-row justify-between items-center gap-6">
 
                         <div class="flex gap-2 flex-wrap">
+                            @if (isset($contentKeywords))
+                            <span class="text-accent font-bold uppercase tracking-wider block mb-2">كلمات
+                                مفتاحية:</span>
                             @include('partials.keyword-tags', ['keywords' => $contentKeywords])
+                            @endif
+                            {{-- @include('partials.keyword-tags', ['keywords' => $contentKeywords]) --}}
                         </div>
                         <div class="flex gap-4">
                             <span class="text-gray-500 font-bold ml-2">مشاركة:</span>
@@ -80,29 +86,37 @@
                         </div>
                     </div>
 
-                    @if($projects->count() > 0)
+                    @if ($projects->count() > 0)
                     <div class="mt-12">
                         <h3 class="text-2xl font-bold text-accent mb-6">أعمالنا في {{ $service->title }}</h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            @foreach($projects as $project)
-                            <div class="group relative overflow-hidden rounded-xl shadow-md bg-white border border-gray-100 hover:shadow-xl transition-all duration-300">
+                            @foreach ($projects as $project)
+                            <div
+                                class="group relative overflow-hidden rounded-xl shadow-md bg-white border border-gray-100 hover:shadow-xl transition-all duration-300">
                                 <div class="relative h-48 overflow-hidden">
-                                    @if($project->main_image)
-                                    <img src="{{ asset('storage/' . $project->main_image) }}" alt="{{ $project->title }}" class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500">
+                                    @if ($project->main_image)
+                                    <img src="{{ asset('storage/' . $project->main_image) }}"
+                                        alt="{{ $project->title }}"
+                                        class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500" loading="lazy" decoding="async" >
                                     @else
-                                    <div class="w-full h-full bg-gray-200 flex items-center justify-center text-gray-400">
+                                    <div
+                                        class="w-full h-full bg-gray-200 flex items-center justify-center text-gray-400">
                                         <i class="fa-regular fa-image text-4xl"></i>
                                     </div>
                                     @endif
-                                    <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                                        <a href="{{ route('projects.show', $project->slug) }}" class="bg-primary text-white px-4 py-2 rounded-full text-sm font-bold transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                                    <div
+                                        class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                                        <a href="{{ route('projects.show', $project->slug) }}"
+                                            class="bg-primary text-white px-4 py-2 rounded-full text-sm font-bold transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
                                             عرض التفاصيل
                                         </a>
                                     </div>
                                 </div>
                                 <div class="p-4">
-                                    <h4 class="font-bold text-lg mb-2 text-gray-800 group-hover:text-primary transition-colors">
-                                        <a href="{{ route('projects.show', $project->slug) }}">{{ $project->title }}</a>
+                                    <h4
+                                        class="font-bold text-lg mb-2 text-gray-800 group-hover:text-primary transition-colors">
+                                        <a
+                                            href="{{ route('projects.show', $project->slug) }}">{{ $project->title }}</a>
                                     </h4>
                                     <p class="text-gray-600 text-sm line-clamp-2">
                                         {{ Str::limit(strip_tags($project->description), 100) }}
@@ -161,7 +175,7 @@
                         خدمات أخرى
                     </h3>
 
-                    <ul class="space-y-2">
+                    <ul class="space-y-3">
                         @foreach ($sidebarServices as $serviceItem)
                         <li>
                             {{-- التحقق مما إذا كان هذا الرابط هو الصفحة الحالية لتمييزه --}}
@@ -171,9 +185,29 @@
                             @endphp
 
                             <a href="{{ route('services.show', $serviceItem->slug) }}"
-                                class="block px-4 py-3 rounded-lg shadow-sm transition-all font-medium
-                                  {{ $isActive ? 'bg-white text-accent border-r-4 border-accent pointer-events-none' : 'bg-white text-gray-600 hover:bg-accent hover:text-white' }}">
-                                {{ $serviceItem->title }} {{-- تأكد أن اسم العمود في الداتابيز title أو name --}}
+                                class="group flex items-center gap-3 p-3 rounded-lg shadow-sm transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40
+                                  {{ $isActive ? 'bg-white text-accent border-r-4 border-accent pointer-events-none' : 'bg-white text-gray-700 hover:bg-accent hover:text-white' }}">
+                                <div class="shrink-0 w-14 h-14 rounded-lg overflow-hidden bg-gray-100 ring-1 ring-gray-200">
+                                    @if (!empty($serviceItem->image_path))
+                                    <img src="{{ asset('storage/' . $serviceItem->image_path) }}"
+                                        alt="{{ $serviceItem->title }}" loading="lazy" decoding="async"
+                                        class="w-full h-full object-cover">
+                                    @else
+                                    <div class="w-full h-full flex items-center justify-center text-gray-400">
+                                        <i class="fa-solid fa-image"></i>
+                                    </div>
+                                    @endif
+                                </div>
+
+                                <div class="min-w-0 flex-1">
+                                    <span class="block font-semibold leading-6 line-clamp-2 break-words">
+                                        {{ $serviceItem->title }}
+                                    </span>
+                                </div>
+
+                                <div class="shrink-0 text-xs opacity-60 group-hover:opacity-100 transition-opacity">
+                                    <i class="fa-solid fa-chevron-left"></i>
+                                </div>
                             </a>
                         </li>
                         @endforeach
@@ -192,13 +226,15 @@
                             <div class="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center text-accent">
                                 <i class="fa-solid fa-phone"></i>
                             </div>
-                            <span dir="ltr"><a href="tel:{{ $settings['phone'] ?? '+966 5 3279 1522' }}">{{ $settings['phone'] ?? '+966 5 3279 1522' }}</a></span>
+                            <span dir="ltr"><a
+                                    href="tel:{{ $settings['phone'] ?? '+966 5 3279 1522' }}">{{ $settings['phone'] ?? '+966 5 3279 1522' }}</a></span>
                         </li>
                         <li class="flex items-center gap-3">
                             <div class="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center text-accent">
                                 <i class="fab fa-whatsapp"></i>
                             </div>
-                            <span> <a href="{{ $settings['whatsapp'] ?? '+966532791522' }}" target="_blank" class="hover:text-accent">{{ $settings['phone'] ?? '+966 5 3279 1522' }}</a></span>
+                            <span> <a href="{{ $settings['whatsapp'] ?? '+966532791522' }}" target="_blank"
+                                    class="hover:text-accent">{{ $settings['phone'] ?? '+966 5 3279 1522' }}</a></span>
                         </li>
                     </ul>
                     <a href="{{ route('contact') }}"
