@@ -52,11 +52,11 @@
             <div class="w-full lg:w-2/3">
                 <div class="reveal">
                     @if ($service->image_path)
-                    <img src="{{ asset('storage/' . $service->image_path) }}" alt="{{ $service->title }}"
+                    <img src="{{ asset('storage/' . $service->image_path) }}" alt="{{ $service->title }}" title="{{ $service->title }}"
                         class="w-full  object-cover h-[400px] lg:h-[500px] rounded-xl shadow-lg mb-8" loading="lazy" decoding="async">
                     @endif {{-- object-cover --}}
                     @if ($service->title)
-                    <h2 class="text-3xl font-bold text-accent mb-6">{{ $service->title }}</h2>
+                    <h2 class="text-3xl font-bold text-accent mb-6" title="{{ $service->title }}">{{ $service->title }}</h2>
                     @endif
 
                     <p class="text-gray-600 mb-6 leading-relaxed text-lg">
@@ -197,7 +197,7 @@
                                 <div class="shrink-0 w-14 h-14 rounded-lg overflow-hidden bg-gray-100 ring-1 ring-gray-200">
                                     @if (!empty($serviceItem->image_path))
                                     <img src="{{ asset('storage/' . $serviceItem->image_path) }}"
-                                        alt="{{ $serviceItem->title }}" loading="lazy" decoding="async"
+                                        alt="{{ $serviceItem->title }}" loading="lazy" decoding="async" title="{{ $serviceItem->title }}"
                                         class="w-full h-full object-cover">
                                     @else
                                     <div class="w-full h-full flex items-center justify-center text-gray-400">

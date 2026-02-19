@@ -24,7 +24,7 @@
         <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 animate-fade-in-up text-accent">من نـحـن</h1>
         <nav
             class="flex justify-center items-center gap-2 text-sm md:text-base text-gray-300 animate-fade-in-up animation-delay-200">
-            <a href="{{ route('home') }}" class="hover:text-white transition-colors">الرئيسية</a>
+            <a href="{{ route('home') }}" class="hover:text-white transition-colors" title="الرئيسية">الرئيسية</a>
             <span>/</span>
             <span
                 class="text-accent/4 transition-colors py-1 relative  after:absolute after:bottom-0 after:right-0 after:w-full after:h-0.5 after:bg-accent after:transition-all">من
@@ -199,7 +199,7 @@
                     المعماري.
                 </p>
                 <div class="flex flex-col sm:flex-row gap-6 mb-8">
-                    <a href="{{ route('about') }}"
+                    <a href="{{ route('about') }}" title="اكتشف المزيد عن معلم دهانات وديكورات جدة"
                         class="inline-flex items-center gap-2 text-accent font-bold hover:text-white transition-colors group">
                         اكتشف المزيد من مهاراتنا
                         <i class="fa-solid fa-arrow-left group-hover:-translate-x-1 transition-transform"></i>
@@ -275,7 +275,7 @@
                 class="bg-accent hover:bg-yellow-600 text-white px-8 py-4 rounded-lg font-bold transition-all shadow-lg hover:shadow-accent/50 transform hover:-translate-y-1">
                 تواصل معنا الآن
             </a>
-            <a href="{{ route(name: 'projects.index') }}"
+            <a href="{{ route(name: 'projects.index') }}" title="شاهد أعمالنا">
                 class="bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/30 text-white px-8 py-4 rounded-lg font-bold transition-all hover:shadow-lg transform hover:-translate-y-1">
                 شاهد أعمالنا
             </a>

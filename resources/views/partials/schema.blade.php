@@ -13,6 +13,23 @@ $siteName = $settings['site_name'] ?? config('app.name');
 $siteUrl = url('/');
 $siteDescription = !empty($meta_description ?? null) ? $meta_description : ($settings['site_description'] ?? '');
 
+$schemaKeywords = $meta_keywords ?? null;
+if (is_array($schemaKeywords)) {
+$schemaKeywords = implode(', ', array_filter(array_map('trim', $schemaKeywords), fn($v) => $v !== ''));
+}
+if (empty($schemaKeywords) && request()->routeIs('keywords.show') && isset($keyword) && is_object($keyword)) {
+$schemaKeywords = $keyword->name ?? null;
+}
+if (empty($schemaKeywords) && isset($contentKeywords) && $contentKeywords && method_exists($contentKeywords, 'pluck')) {
+$schemaKeywords = implode(', ', $contentKeywords->pluck('name')->filter()->unique()->values()->all());
+}
+if (empty($schemaKeywords) && isset($pageContentKeywords) && $pageContentKeywords && method_exists($pageContentKeywords, 'pluck')) {
+$schemaKeywords = implode(', ', $pageContentKeywords->pluck('name')->filter()->unique()->values()->all());
+}
+$schemaKeywords = !empty($schemaKeywords)
+? preg_replace('/\s+/u', ' ', strip_tags((string) $schemaKeywords))
+: null;
+
 // 1. Organization Schema
 $organization = [
 "@type" => "HomeAndConstructionBusiness", // نوع محدد لنشاط المقاولات والدهانات
@@ -45,7 +62,7 @@ $organization["address"] = [
 "@type" => "PostalAddress",
 "streetAddress" => $settings['address'],
 "addressLocality" => 'جدة',
-"addressRegion" => 'مكة المكرمة',
+"addressRegion" => 'جده المنطقة الغربية',
 "addressCountry" => 'SA',
 ];
 }
@@ -114,6 +131,13 @@ $addToGraph = function($item) use (&$schema) {
 $schema['@graph'][] = $item;
 };
 
+$addToGraphWithKeywords = function(array $item) use ($addToGraph, &$schemaKeywords) {
+if (!empty($schemaKeywords)) {
+$item['keywords'] = $schemaKeywords;
+}
+$addToGraph($item);
+};
+
 // إضافة المؤسسة كعنصر أساسي في كل الصفحات
 $addToGraph($organization);
 
@@ -157,7 +181,7 @@ $website = [
 ],
 "inLanguage" => "ar-SA"
 ];
-$addToGraph($website);
+$addToGraphWithKeywords($website);
 
 // Reviews & AggregateRating (التقييمات)
 if (isset($testimonials) && count($testimonials) > 0) {
@@ -214,7 +238,7 @@ $servicesList[] = [
 }
 }
 
-$addToGraph([
+$addToGraphWithKeywords([
 "@type" => "CollectionPage",
 "name" => ($settings['services_meta_title'] ?? "خدماتنا") . ' - ' . $siteName,
 "url" => url()->current(),
@@ -228,7 +252,7 @@ elseif (request()->routeIs('services.show') && isset($service) && is_object($ser
 $addBreadcrumb($settings['services_meta_title'] ?? "الخدمات", route('services.index'));
 $addBreadcrumb($service->title, url()->current());
 
-$addToGraph([
+$addToGraphWithKeywords([
 "@type" => "Service",
 "name" => ($service->meta_title ?: $service->title) . ' - ' . $siteName,
 "url" => url()->current(),
@@ -264,7 +288,7 @@ $projectsList[] = [
 }
 }
 
-$addToGraph([
+$addToGraphWithKeywords([
 "@type" => "CollectionPage",
 "name" => ($settings['projects_meta_title'] ?? "مشاريعنا") . ' - ' . $siteName,
 "url" => url()->current(),
@@ -278,7 +302,7 @@ elseif (request()->routeIs('projects.show') && isset($project) && is_object($pro
 $addBreadcrumb($settings['projects_meta_title'] ?? "المشاريع", route('projects.index'));
 $addBreadcrumb($project->title, url()->current());
 
-$addToGraph([
+$addToGraphWithKeywords([
 "@type" => "CreativeWork",
 "name" => ($project->meta_title ?: $project->title) . ' - ' . $siteName,
 "url" => url()->current(),
@@ -309,7 +333,7 @@ $blogList[] = [
 }
 }
 
-$addToGraph([
+$addToGraphWithKeywords([
 "@type" => "Blog",
 "name" => ($settings['blog_meta_title'] ?? "المدونة") . ' - ' . $siteName,
 "url" => url()->current(),
@@ -323,7 +347,7 @@ elseif (request()->routeIs('blog.show') && isset($post) && is_object($post)) {
 $addBreadcrumb($settings['blog_meta_title'] ?? "المدونة", route('blog.index'));
 $addBreadcrumb($post->title, url()->current());
 
-$addToGraph([
+$addToGraphWithKeywords([
 "@type" => "BlogPosting",
 "headline" => ($post->meta_title ?: $post->title) . ' - ' . $siteName,
 "url" => url()->current(),
@@ -354,7 +378,7 @@ $faqItems[] = [
 ];
 }
 
-$addToGraph([
+$addToGraphWithKeywords([
 "@type" => "FAQPage",
 "mainEntity" => $faqItems
 ]);
@@ -414,7 +438,7 @@ $related[] = ["@type" => "BlogPosting", "headline" => $bp->title ?? '', "url" =>
 }
 }
 
-$addToGraph([
+$addToGraphWithKeywords([
 "@type" => "CollectionPage",
 "name" => $keyword->name . ' - ' . $siteName,
 "url" => url()->current(),
@@ -427,7 +451,7 @@ $addToGraph([
 // --- صفحات ثابتة (Static Pages) ---
 elseif (request()->routeIs('about')) {
 $addBreadcrumb($settings['about_meta_title'] ?? "من نحن", route('about'));
-$addToGraph([
+$addToGraphWithKeywords([
 "@type" => "AboutPage",
 "name" => ($settings['about_meta_title'] ?? "من نحن") . ' - ' . $siteName,
 "url" => url()->current(),
@@ -437,7 +461,7 @@ $addToGraph([
 }
 elseif (request()->routeIs('contact')) {
 $addBreadcrumb($settings['contact_meta_title'] ?? "اتصل بنا", route('contact'));
-$addToGraph([
+$addToGraphWithKeywords([
 "@type" => "ContactPage",
 "name" => ($settings['contact_meta_title'] ?? "اتصل بنا") . ' - ' . $siteName,
 "url" => url()->current(),

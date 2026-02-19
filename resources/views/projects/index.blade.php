@@ -26,7 +26,7 @@ collect([$settings['site_name'] ?? null, 'مشاريعنا', 'مشاريع', 'ا
         <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 animate-fade-in-up text-accent">اعمالنا</h1>
         <nav
             class="flex justify-center items-center gap-2 text-sm md:text-base text-gray-300 animate-fade-in-up animation-delay-200">
-            <a href="{{ route('home') }}" class="hover:text-white transition-colors">الرئيسية</a>
+            <a href="{{ route('home') }}" class="hover:text-white transition-colors" title="الرئيسية">الرئيسية</a>
             <span>/</span>
             <span
                 class="text-accent/4 transition-colors py-1 relative  after:absolute after:bottom-0 after:right-0 after:w-full after:h-0.5 after:bg-accent after:transition-all">جميع

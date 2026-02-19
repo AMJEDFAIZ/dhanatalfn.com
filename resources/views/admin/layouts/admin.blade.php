@@ -114,7 +114,6 @@
         }
     </style>
     @stack('styles')
-    <script src="cdn.tiny.cloud"></script>
 
 </head>
 

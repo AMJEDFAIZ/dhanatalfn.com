@@ -10,7 +10,7 @@ use Illuminate\Validation\ValidationException;
 
 class KeywordService
 {
-    public const META_LIMIT = 12;
+    public const META_LIMIT = 15;
     public const CONTENT_LIMIT = 20;
 
     public function parseNames(?string $input): array

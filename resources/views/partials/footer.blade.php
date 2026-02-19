@@ -10,52 +10,52 @@
              <div>
                  <div class="flex items-center gap-3 mb-6">
                      <img src="{{ isset($settings['site_logo']) ? asset('storage/' . $settings['site_logo']) : asset('logo.PNG') }}"
-                         alt="شعار" class="h-12 bg-white p-1 rounded">
-                     <h3 class="text-xl font-bold">{{ $settings['site_name'] ?? 'معلم دهانات وديكورات جدة' }}</h3>
+                         alt="شعار" class="h-12 bg-white p-1 rounded" title="{{ $settings['site_name'] ?? 'معلم دهانات وديكورات جدة' }}">
+                     <h3 class="text-xl font-bold" title="{{ $settings['site_name'] ?? 'معلم دهانات وديكورات جدة' }}">{{ $settings['site_name'] ?? 'معلم دهانات وديكورات جدة' }}</h3>
                  </div>
-                 <p class="text-gray-400 mb-6 leading-relaxed text-sm">
+                 <p class="text-gray-400 mb-6 leading-relaxed text-sm" title="{{ $settings['site_name'] ?? 'معلم دهانات وديكورات جدة' }}">
                      {{ $settings['site_description'] ?? 'الفـن الـحـديـث هي شركة رائدة في مجال المقاولات والإنشاءات، نسعى لتقديم أفضل الخدمات بجودة عالية واحترافية.' }}
                  </p>
                  <div class="flex space-x-reverse space-x-4">
 
                      @if (isset($settings['phone']))
-                     <a href="tel:{{ $settings['phone'] }}"
+                     <a href="tel:{{ $settings['phone'] }}" title="اتصل ب {{ $settings['site_name'] ?? 'معلم دهانات وديكورات جدة' }}"
                          class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-accent transition-colors"><i
                              class="fas fa-phone"></i></a>
                      @endif
 
 
                      @if (isset($settings['whatsapp']))
-                     <a href="{{ $settings['whatsapp'] }}"
+                     <a href="{{ $settings['whatsapp'] }}" title="تواصل معنا عبر واتساب {{ $settings['site_name'] ?? 'معلم دهانات وديكورات جدة' }}"
                          class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-accent transition-colors"
-                         target="_blank" rel="noopener noreferrer"><i class="fab fa-whatsapp"></i></a>
+                         target="_blank" rel="noopener noreferrer"><i class="fab fa-whatsapp fa-lg"></i></a>
                      @endif
 
 
 
                      @if (isset($settings['tiktok']))
-                     <a href="{{ $settings['tiktok'] }}"
+                     <a href="{{ $settings['tiktok'] }}" title="تابعنا على تيك توك {{ $settings['site_name'] ?? 'معلم دهانات وديكورات جدة' }}"
                          class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-accent transition-colors"
                          target="_blank" rel="noopener noreferrer"><i class="fab fa-tiktok"></i></a>
                      @endif
 
                      @if (isset($settings['facebook']))
-                     <a href="{{ $settings['facebook'] }}"
+                     <a href="{{ $settings['facebook'] }}" title="تابعنا على فيسبوك {{ $settings['site_name'] ?? 'معلم دهانات وديكورات جدة' }}"
                          class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-accent transition-colors"
                          target="_blank" rel="noopener noreferrer"><i class="fab fa-facebook-f"></i></a>
                      @endif
                      @if (isset($settings['twitter']))
-                     <a href="{{ $settings['twitter'] }}"
+                     <a href="{{ $settings['twitter'] }}" title="تابعنا على تويتر {{ $settings['site_name'] ?? 'معلم دهانات وديكورات جدة' }}"
                          class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-accent transition-colors"
                          target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-twitter"></i></a>
                      @endif
                      @if (isset($settings['instagram']))
-                     <a href="{{ $settings['instagram'] }}"
+                     <a href="{{ $settings['instagram'] }}" title="تابعنا على انستجرام {{ $settings['site_name'] ?? 'معلم دهانات وديكورات جدة' }}"
                          class=" w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-accent transition-colors "
                          target="_blank" rel="noopener noreferrer"><i class="fab fa-instagram"></i></a>
                      @endif
                      @if (isset($settings['linkedin']))
-                     <a href="{{ $settings['linkedin'] }}"
+                     <a href="{{ $settings['linkedin'] }}" title="تابعنا على لينكدإن {{ $settings['site_name'] ?? 'معلم دهانات وديكورات جدة' }}"
                          class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-accent transition-colors"
                          target="_blank" rel="noopener noreferrer"><i class="fab fa-linkedin-in"></i></a>
                      @endif
@@ -121,14 +121,14 @@
 
                          <i class="fa-solid fa-phone text-xs"></i>
                          <span dir="ltr" class="hover:text-accent transition-colors"><a
-                                 href="tel:{{ $settings['phone'] ?? '+966 5 3279 1522' }}">{{ $settings['phone'] ?? '+966 5 3279 1522' }}</a></span>
+                                 href="tel:{{ $settings['phone'] ?? '+966 5 3279 1522' }}" title="اتصل ب {{ $settings['site_name'] ?? 'معلم دهانات وديكورات جدة' }}">{{ $settings['phone'] ?? '+966 5 3279 1522' }}</a></span>
                      </li>
                      <li class="hover:text-accent transition-colors flex items-center gap-2">
 
-                         <i class="fab fa-whatsapp text-xs"></i>
+                         <i class="fab fa-whatsapp text-bold"></i>
                          <span dir="ltr" class="hover:text-accent transition-colors"> <a
                                  href="{{ $settings['whatsapp'] ?? '+966 5 3279 1522' }}" target="_blank"
-                                 rel="noopener noreferrer">+966 5 3279
+                                 rel="noopener noreferrer" title="تواصل معنا عبر واتساب {{ $settings['site_name'] ?? 'معلم دهانات وديكورات جدة' }}">+966 5 3279
                                  1522</a></span>
                      </li>
                      <li class="hover:text-accent transition-colors flex items-center gap-2">
@@ -156,7 +156,7 @@
              class="border-t border-gray-700 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-lg text-gray-400">
 
              <p>تم التصميم والتطوير بواسطة <span class="text-white ">
-                     <a href="https://wa.me/+967775226109"
+                     <a href="https://wa.me/+967775226109" title="تواصل مع مطور الموقع Amjed.Dev" target="_blank" rel="noopener noreferrer"
                          class="hover:text-accent transition-colors">Amjed.Dev</a></span></p>
              <p> &copy; {{ date('Y') }}
                  {{ $settings['site_name'] ?? 'الفـن الـحـديـث' }}. جميع الحقوق محفوظة.

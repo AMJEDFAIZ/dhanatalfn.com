@@ -92,7 +92,7 @@ class ServiceController extends Controller
 
         // جلب 8 خدمات عشوائية
         // ملاحظة: إذا كنت في صفحة خدمة، يفضل استبعاد الخدمة الحالية باستخدام where('slug', '!=', $slug)
-        $sidebarServices = Service::inRandomOrder()->limit(8)->get();
+        $sidebarServices = Service::inRandomOrder()->limit(15)->get();
         $meta = app(SeoMetaService::class)->metaForModel($service, [
             'fallback_keywords' => array_filter([$settings['site_name'] ?? null, $service->title]),
         ]);

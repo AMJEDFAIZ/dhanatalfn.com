@@ -134,7 +134,7 @@ collect([$settings['site_name'] ?? null, 'خدماتنا', 'خدمات', 'الخ
         <p class="text-gray-300 mb-8 max-w-2xl mx-auto">
             نحن جاهزون لتنفيذ مشروعك القادم بنفس مستوى الجودة والاحترافية.
         </p>
-        <a href="{{ route('contact') }}"
+        <a href="{{ route('contact') }}" title="تواصل معنا معلم دهانات وديكورات بجدة"
             class="inline-block bg-accent text-white px-8 py-3 rounded-full font-bold hover:bg-white hover:text-primary transition-all shadow-lg">
             تواصل معنا الآن
         </a>

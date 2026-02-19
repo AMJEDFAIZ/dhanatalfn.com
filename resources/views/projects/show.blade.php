@@ -126,7 +126,7 @@
                                 $isActive = request()->route('slug') == $projectItem->slug;
                                 @endphp
 
-                                <a href="{{ route('projects.show', $projectItem->slug) }}"
+                                <a href="{{ route('projects.show', $projectItem->slug) }}" title="{{ $projectItem->title }}"
                                     class="group flex items-center gap-3 p-3 rounded-lg shadow-sm transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40
                                   {{ $isActive ? 'bg-white text-accent border-r-4 border-accent pointer-events-none' : 'bg-white text-gray-700 hover:bg-accent hover:text-white' }}">
                                     <div class="shrink-0 w-14 h-14 rounded-lg overflow-hidden bg-gray-100 ring-1 ring-gray-200">
@@ -217,13 +217,13 @@
                 class="mt-12 pt-8 border-t  border-gray-200 flex flex-col md:flex-row justify-between items-center gap-6">
 
                 <div class="flex gap-2 flex-wrap">
-                        @if (isset($contentKeywords))
-                        <span class="text-accent font-bold uppercase tracking-wider block mb-2">كلمات
-                            مفتاحية:</span>
-                        @include('partials.keyword-tags', ['keywords' => $contentKeywords])
-                        @endif
-                        {{-- @include('partials.keyword-tags', ['keywords' => $contentKeywords]) --}}
-                    </div>
+                    @if (isset($contentKeywords))
+                    <span class="text-accent font-bold uppercase tracking-wider block mb-2">كلمات
+                        مفتاحية:</span>
+                    @include('partials.keyword-tags', ['keywords' => $contentKeywords])
+                    @endif
+                    {{-- @include('partials.keyword-tags', ['keywords' => $contentKeywords]) --}}
+                </div>
                 <div class="flex gap-4">
                     <span class="text-gray-500 font-bold ml-2">مشاركة:</span>
                     {{-- روابط مشاركة حقيقية --}}
@@ -254,7 +254,7 @@
                     <div
                         class="gallery-item group relative h-64 rounded-xl overflow-hidden shadow-md cursor-zoom-in">
                         <img src="{{ asset('storage/' . $image->image_path) }}"
-                            alt="{{ $image->title }}"
+                            alt="{{ $image->title }}" tabindex=""
                             class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" loading="lazy" decoding="async">
 
                         <div

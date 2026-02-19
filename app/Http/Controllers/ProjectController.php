@@ -33,7 +33,7 @@ class ProjectController extends Controller
         $projectImages = $project->images()->paginate(6);
         // جلب 8 خدمات عشوائية
         // ملاحظة: إذا كنت في صفحة خدمة، يفضل استبعاد الخدمة الحالية باستخدام where('slug', '!=', $slug)
-        $sidebarProjects = Project::inRandomOrder()->limit(8)->get();
+        $sidebarProjects = Project::inRandomOrder()->limit(15)->get();
         $meta = app(SeoMetaService::class)->metaForModel($project, [
             'fallback_keywords' => array_filter([$settings['site_name'] ?? null, $project->title]),
         ]);

@@ -43,7 +43,7 @@ class BlogController extends Controller
         $recentPosts = BlogPost::where('active', true) //شرط النشاط
             ->where('slug', '!=', $slug)
             ->latest()
-            ->take(5)
+            ->take(15)
             ->get();
         /*
             // جلب المقال السابق (الأصغر معرفاً)
