@@ -41,6 +41,9 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     Route::get('settings', [App\Http\Controllers\Admin\SettingController::class, 'index'])->name('settings.index');
     Route::put('settings', [App\Http\Controllers\Admin\SettingController::class, 'update'])->name('settings.update');
     Route::resource('messages', App\Http\Controllers\Admin\MessageController::class)->only(['index', 'show', 'update', 'destroy']);
+    Route::post('messages/{message}/reply', [App\Http\Controllers\Admin\MessageController::class, 'reply'])
+        ->middleware('throttle:10,1')
+        ->name('messages.reply');
     Route::post('messages/mark-all-read', [App\Http\Controllers\Admin\MessageController::class, 'markAllRead'])->name('messages.markAllRead');
 });
 

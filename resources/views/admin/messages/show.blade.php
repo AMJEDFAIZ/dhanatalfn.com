@@ -36,10 +36,8 @@
                     <div class="mb-2 text-muted">تم الرد في: {{ $message->replied_at->format('Y-m-d H:i') }}</div>
                     <div class="border p-2 mb-3">{{ $message->reply_content }}</div>
                 @endif
-                <form action="{{ route('admin.messages.update', $message->id) }}" method="post">
+                <form action="{{ route('admin.messages.reply', $message->id) }}" method="post">
                     @csrf
-                    @method('PUT')
-                    <input type="hidden" name="action" value="reply">
                     <div class="mb-3">
                         <textarea name="reply_content" rows="6" class="form-control" placeholder="نص الرد"></textarea>
                     </div>

@@ -28,6 +28,15 @@ class BlogController extends Controller
         $meta_description = Setting::where('key', 'blog_meta_description')->value('value') ?? 'اقرأ أحدث المقالات والنصائح في مجال المقاولات والبناء.';
         $seoPage = app(SeoPageService::class)->getByKey('blog_index');
         $meta_keywords = app(SeoMetaService::class)->keywordsString($seoPage?->keywordsForMeta() ?? []);
+        if ($search !== '') {
+            $meta_title = $search . ' - ' . $meta_title;
+            $meta_description = $search . ' - ' . $meta_description;
+            if ($meta_keywords !== '') {
+                $meta_keywords = $meta_keywords . ', ' . $search;
+            } else {
+                $meta_keywords = $search;
+            }
+        }
         $pageContentKeywords = $seoPage?->contentKeywords()->where('keywords.active', true)->get() ?? collect();
 
         return view('blog.index', compact('posts', 'meta_title', 'meta_description', 'meta_keywords', 'search', 'pageContentKeywords'));

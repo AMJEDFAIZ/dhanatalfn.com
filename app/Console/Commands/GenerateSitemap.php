@@ -452,7 +452,7 @@ class GenerateSitemap extends Command
     /**
      * Generate a human-readable HTML sitemap.
      */
-    protected function generateHtmlSitemap(string $path)
+   /*  protected function generateHtmlSitemap(string $path)
     {
         $this->info('Generating HTML sitemap...');
 
@@ -536,5 +536,327 @@ class GenerateSitemap extends Command
 </html>';
 
         File::put($path, $html);
+    } */
+
+protected function generateHtmlSitemap(string $path)
+{
+    $this->info('Generating HTML sitemap (HTML view)...');
+
+    $appName = config('app.name', 'Site Map');
+    $generatedDate = now();
+    $date = $generatedDate->format('Y-m-d');
+
+    // Use collected URLs (populated earlier in handle())
+    $urls = $this->urls ?? [];
+
+    // Group URLs heuristically by first path segment for better sections
+    $groups = [
+        'home' => ['title' => 'الصفحات الرئيسية', 'items' => []],
+        'services' => ['title' => 'الخدمات', 'items' => []],
+        'projects' => ['title' => 'المشاريع', 'items' => []],
+        'blog' => ['title' => 'المدونة', 'items' => []],
+        'keywords' => ['title' => 'الكلمات المفتاحية', 'items' => []],
+        'other' => ['title' => 'روابط عامة', 'items' => []],
+    ];
+
+    foreach ($urls as $u) {
+        $loc = $u['loc'] ?? '';
+        // try determine section from URL path
+        $pathPart = parse_url($loc, PHP_URL_PATH) ?? '';
+        $firstSeg = strtolower(trim(explode('/', ltrim($pathPart, '/'))[0] ?? ''));
+        if ($firstSeg === '' || $firstSeg === 'home') {
+            $groups['home']['items'][] = $u;
+        } elseif (str_contains($firstSeg, 'service') || $firstSeg === 'services') {
+            $groups['services']['items'][] = $u;
+        } elseif (str_contains($firstSeg, 'project') || $firstSeg === 'projects') {
+            $groups['projects']['items'][] = $u;
+        } elseif ($firstSeg === 'blog' || str_contains($firstSeg, 'post')) {
+            $groups['blog']['items'][] = $u;
+        } elseif (str_contains($firstSeg, 'keyword') || $firstSeg === 'keywords' || $firstSeg === 'tag') {
+            $groups['keywords']['items'][] = $u;
+        } else {
+            $groups['other']['items'][] = $u;
+        }
     }
+
+    // Helper closures
+    $fmtDate = function ($d) {
+        try {
+            if ($d instanceof \Carbon\Carbon) return $d->format('Y-m-d');
+            if (is_numeric($d)) return date('Y-m-d', (int)$d);
+            if (empty($d)) return '';
+            return date('Y-m-d', strtotime($d));
+        } catch (\Throwable $e) {
+            return '';
+        }
+    };
+
+    $escape = function ($v) {
+        return htmlspecialchars((string)($v ?? ''), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+    };
+
+    // Build HTML via output buffering for readability
+    ob_start();
+    ?>
+    <!doctype html>
+    <html lang="ar" dir="rtl">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1">
+        <title>خريطة الموقع — <?= $escape($appName) ?></title>
+        <meta name="description" content="<?= $escape("خريطة موقع {$appName} — عرض شامل للصفحات، المنشورات، المشاريع، والخدمات مع بيانات SEO (lastmod, priority, changefreq) وصور مصغرة.") ?>">
+        <link rel="canonical" href="<?= $escape(url('/sitemap.html')) ?>">
+        <link rel="alternate" type="application/xml" title="Sitemap XML" href="<?= $escape(url('/sitemap.xml')) ?>">
+        <style>
+            :root{ --bg:#f7fafc; --card:#ffffff; --muted:#6b7280; --accent:#0ea5a4; --accent-2:#0b5dff; --maxw:1200px; }
+            html,body{height:100%}
+            body{font-family: system-ui, -apple-system, "Noto Naskh Arabic", "Noto Sans", Roboto, "Segoe UI", Arial; background:var(--bg); color:#0f172a; margin:0; padding:1.25rem;}
+            .wrap{max-width:var(--maxw); margin:0 auto;}
+            header{display:flex; gap:1rem; align-items:center; justify-content:space-between; margin-bottom:1rem; flex-wrap:wrap;}
+            h1{font-size:1.25rem; margin:0;}
+            .sub{color:var(--muted); font-size:0.95rem}
+            .controls{display:flex; gap:0.5rem; align-items:center; flex-wrap:wrap;}
+            .input, .select, .btn{padding:0.5rem 0.75rem; border-radius:8px; border:1px solid #e6eef7; background:#fff; font-size:0.95rem;}
+            .grid{display:grid; grid-template-columns: 1fr 320px; gap:1rem; align-items:start;}
+            main{background:var(--card); padding:1rem; border-radius:10px; box-shadow:0 8px 28px rgba(2,6,23,0.06);}
+            aside{background:var(--card); padding:1rem; border-radius:10px; box-shadow:0 6px 18px rgba(2,6,23,0.04); height:fit-content;}
+            .stats{display:flex; gap:1rem; align-items:center; flex-wrap:wrap; margin-bottom:0.5rem}
+            .card-small{background:#f8fafc; padding:0.5rem 0.75rem; border-radius:8px; border:1px solid #eef2f7; font-size:0.9rem}
+            .section{margin-top:1rem}
+            .section h2{margin:0 0 0.6rem 0; font-size:1.05rem; color:#111; border-bottom:1px dashed #eef2f7; padding-bottom:0.45rem}
+            .list{display:grid; gap:0.6rem}
+            .item{display:flex; gap:0.8rem; align-items:flex-start; padding:0.55rem; border-radius:8px; background:#fff; border:1px solid #f1f5f9}
+            .thumb{width:90px;height:64px;object-fit:cover;border-radius:6px;flex:0 0 90px}
+            .item .col{flex:1;min-width:0}
+            .item a{font-weight:600;color:var(--accent-2);text-decoration:none}
+            .meta-small{color:var(--muted);font-size:0.86rem;margin-top:0.35rem}
+            .badge{display:inline-block;padding:0.2rem 0.45rem;border-radius:6px;background:#eff6ff;color:#0369a1;font-size:0.78rem;margin-left:0.35rem}
+            footer{margin-top:1rem;text-align:center;color:var(--muted);font-size:0.85rem}
+            .controls .spacer{width:8px}
+            .hidden{display:none !important}
+            @media (max-width:900px){ .grid{grid-template-columns:1fr} .thumb{display:none} }
+        </style>
+    </head>
+    <body>
+    <div class="wrap" role="main">
+        <header>
+            <div>
+                <h1>خريطة الموقع — <?= $escape($appName) ?></h1>
+                <div class="sub">تم التوليد: <?= $escape($date) ?> — الروابط الإجمالية: <strong id="totalCount"><?= count($urls) ?></strong></div>
+            </div>
+
+            <div class="controls" role="region" aria-label="أدوات التحكم">
+                <input id="search" class="input" placeholder="ابحث بعنوان، وصف، أو رابط..." aria-label="بحث في خريطة الموقع">
+                <select id="filterSection" class="select" aria-label="تحديد القسم">
+                    <option value="">كل الأقسام</option>
+                    <?php foreach ($groups as $key => $g): ?>
+                        <?php if (count($g['items'])>0): ?>
+                            <option value="<?= $escape($key) ?>"><?= $escape($g['title']) ?> (<?= count($g['items']) ?>)</option>
+                        <?php endif; ?>
+                    <?php endforeach; ?>
+                </select>
+
+                <select id="sortBy" class="select" aria-label="الفرز">
+                    <option value="default">الترتيب الافتراضي</option>
+                    <option value="lastmod_desc">الأحدث أولا</option>
+                    <option value="lastmod_asc">الأقدم أولا</option>
+                    <option value="priority_desc">الأعلى أولوية</option>
+                    <option value="priority_asc">الأدنى أولوية</option>
+                </select>
+
+                <button id="exportCsv" class="btn" type="button" aria-label="تصدير CSV">تصدير CSV</button>
+                <button id="reset" class="btn" type="button" aria-label="إعادة تعيين">إعادة تعيين</button>
+            </div>
+        </header>
+
+        <div class="grid">
+            <main aria-live="polite">
+                <?php foreach ($groups as $gKey => $group): ?>
+                    <?php if (count($group['items']) === 0) continue; ?>
+                    <section class="section" data-section="<?= $escape($gKey) ?>">
+                        <h2><?= $escape($group['title']) ?> <span class="badge"><?= count($group['items']) ?></span></h2>
+                        <div class="list">
+                            <?php foreach ($group['items'] as $i): ?>
+                                <?php
+                                    $loc = $i['loc'] ?? '#';
+                                    $title = $i['title'] ?? ($i['loc'] ?? $loc);
+                                    $desc = strip_tags($i['description'] ?? '');
+                                    $lastmod = $fmtDate($i['lastmod'] ?? '');
+                                    $priority = isset($i['priority']) ? (string)$i['priority'] : '';
+                                    $freq = $i['changefreq'] ?? '';
+                                    $img = $i['images'][0]['url'] ?? null;
+                                ?>
+                                <article class="item" role="article"
+                                         data-title="<?= $escape(mb_strtolower($title)) ?>"
+                                         data-desc="<?= $escape(mb_strtolower($desc)) ?>"
+                                         data-lastmod="<?= $escape($lastmod) ?>"
+                                         data-priority="<?= $escape($priority) ?>"
+                                         data-freq="<?= $escape($freq) ?>">
+                                    <?php if ($img): ?>
+                                        <img class="thumb" loading="lazy" src="<?= $escape($img) ?>" alt="<?= $escape($i['images'][0]['title'] ?? $title) ?>">
+                                    <?php endif; ?>
+                                    <div class="col">
+                                        <a href="<?= $escape($loc) ?>" target="_blank" rel="noopener noreferrer"><?= $escape($title) ?></a>
+                                        <div class="meta-small">
+                                            <?php if ($lastmod): ?>آخر تعديل: <?= $escape($lastmod) ?><?php endif; ?>
+                                            <?php if ($freq): ?> • تحديث: <?= $escape($freq) ?><?php endif; ?>
+                                            <?php if ($priority !== ''): ?> • أولوية: <?= $escape($priority) ?><?php endif; ?>
+                                        </div>
+                                        <?php if (!empty($desc)): ?>
+                                            <div class="meta-small" style="margin-top:0.4rem"><?= $escape(\Illuminate\Support\Str::limit($desc, 180)) ?></div>
+                                        <?php endif; ?>
+                                    </div>
+                                </article>
+                            <?php endforeach; ?>
+                        </div>
+                    </section>
+                <?php endforeach; ?>
+
+                <footer>
+                    &copy; <?= date('Y') ?> <?= $escape($appName) ?> — تم الإنشاء آلياً بواسطة sitemap generator.
+                </footer>
+            </main>
+
+            <aside aria-label="معلومات خريطة الموقع">
+                <div class="card-small"><strong>XML</strong> <div style="font-size:0.9rem;"><a href="<?= $escape(url('/sitemap.xml')) ?>"><?= $escape(url('/sitemap.xml')) ?></a></div></div>
+                <div style="height:10px"></div>
+                <div class="card-small"><strong>مضغوط (gzip)</strong> <div style="font-size:0.9rem;"><a href="<?= $escape(url('/sitemap.xml.gz')) ?>"><?= $escape(url('/sitemap.xml.gz')) ?></a></div></div>
+                <div style="height:10px"></div>
+                <div class="card-small"><strong>تاريخ التوليد</strong> <div style="font-size:0.9rem;"><?= $escape($generatedDate->toDateTimeString()) ?></div></div>
+
+                <div style="height:10px"></div>
+                <div class="card-small">
+                    <strong>تعليمات سريعة</strong>
+                    <ul style="margin:0.5rem 0 0 0; padding:0; list-style:none; font-size:0.92rem; color:var(--muted)">
+                        <li>استخدم روابط XML لمشاركة sitemap لمحركات البحث.</li>
+                        <li>تحقق من صحة structured data وlastmod عند نشر تغييرات كبيرة.</li>
+                    </ul>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+        "@context":"https://schema.org",
+        "@type":"WebSite",
+        "url":"<?= $escape(url('/')) ?>",
+        "name":"<?= $escape($appName) ?>",
+        "potentialAction":{
+            "@type":"SearchAction",
+            "target":"<?= $escape(url('/')) ?>/?s={search_term_string}",
+            "query-input":"required name=search_term_string"
+        }
+    }
+    </script>
+
+    <script>
+    (function(){
+        const items = Array.from(document.querySelectorAll('.item'));
+        const totalCountEl = document.getElementById('totalCount');
+        const searchEl = document.getElementById('search');
+        const filterSection = document.getElementById('filterSection');
+        const sortBy = document.getElementById('sortBy');
+        const resetBtn = document.getElementById('reset');
+        const exportBtn = document.getElementById('exportCsv');
+
+        function normalize(v){ return (v||'').toString().trim().toLowerCase(); }
+
+        function apply() {
+            const q = normalize(searchEl.value);
+            const section = normalize(filterSection.value);
+            let visible = items.filter(it => {
+                const parentSection = it.closest('section')?.dataset?.section || '';
+                const t = normalize(it.dataset.title || '');
+                const d = normalize(it.dataset.desc || '');
+                const matchesQuery = q === '' || t.includes(q) || d.includes(q) || it.querySelector('a').href.toLowerCase().includes(q);
+                const matchesSection = section === '' || parentSection === section;
+                return matchesQuery && matchesSection;
+            });
+
+            // Sorting
+            const s = sortBy.value;
+            visible.sort((a,b)=>{
+                if (s.startsWith('lastmod')) {
+                    const ad = a.dataset.lastmod || ''; const bd = b.dataset.lastmod || '';
+                    if(ad === bd) return 0;
+                    if(!ad) return 1; if(!bd) return -1;
+                    return s === 'lastmod_desc' ? (bd.localeCompare(ad)) : (ad.localeCompare(bd));
+                }
+                if (s.startsWith('priority')) {
+                    const ap = parseFloat(a.dataset.priority||0); const bp = parseFloat(b.dataset.priority||0);
+                    return s === 'priority_desc' ? (bp - ap) : (ap - bp);
+                }
+                return 0;
+            });
+
+            // Clear DOM and re-append
+            const container = document.querySelector('main');
+            visible.forEach(v => {
+                const sec = v.closest('section');
+                // ensure section visible
+                if (sec && !container.contains(sec)) {
+                    container.appendChild(sec);
+                }
+            });
+
+            // Show/hide items
+            items.forEach(i => i.style.display = visible.includes(i) ? '' : 'none');
+
+            totalCountEl.textContent = visible.length;
+        }
+
+        searchEl.addEventListener('input', apply);
+        filterSection.addEventListener('change', apply);
+        sortBy.addEventListener('change', apply);
+        resetBtn.addEventListener('click', ()=>{
+            searchEl.value=''; filterSection.value=''; sortBy.value='default'; apply();
+        });
+
+        exportBtn.addEventListener('click', ()=>{
+            // Export currently visible items to CSV
+            const headers = ['title','url','lastmod','priority','changefreq','description'];
+            const rows = [];
+            items.forEach(i=>{
+                if (i.style.display === 'none') return;
+                const a = i.querySelector('a');
+                const title = a.textContent.trim();
+                const url = a.href;
+                const lastmod = i.dataset.lastmod || '';
+                const priority = i.dataset.priority || '';
+                const changefreq = i.dataset.freq || '';
+                const desc = i.dataset.desc || '';
+                rows.push([title, url, lastmod, priority, changefreq, desc]);
+            });
+            let csv = headers.join(',') + '\\n' + rows.map(r => r.map(c => '"' + (String(c||'').replace(/"/g,'""')) + '"').join(',')).join('\\n');
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'sitemap-export-<?= date('Ymd_His') ?>.csv';
+            a.style.display = 'none';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
+
+        // initial run
+        apply();
+    })();
+    </script>
+    </body>
+    </html>
+    <?php
+    $html = ob_get_clean();
+
+    // Write file (atomic-ish)
+    try {
+        File::put($path, $html);
+        $this->info("HTML sitemap written to {$path}");
+    } catch (\Throwable $e) {
+        $this->error("Failed to write HTML sitemap: " . $e->getMessage());
+    }
+}
 }

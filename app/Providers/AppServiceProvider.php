@@ -26,15 +26,24 @@ class AppServiceProvider extends ServiceProvider
         // }
 
         try {
-            // تخزين الإعدادات في الكاش لمدة يوم واحد (86400 ثانية)
-            // استخدام تذكر للأبد إذا لم تتغير الإعدادات كثيراً، أو زيادة الوقت
-            $settings = Cache::remember('site_settings', 86400, function () {
-                // التأكد من استرجاع البيانات كمصفوفة مفتاح => قيمة
-                return \App\Models\Setting::pluck('value', 'key')->toArray();
-            });
+            $loadSettings = function (): array {
+                try {
+                    $settings = Cache::get('site_settings');
+                    if (!is_array($settings) || $settings === []) {
+                        $settings = \App\Models\Setting::pluck('value', 'key')->toArray();
+                        if ($settings !== []) {
+                            Cache::put('site_settings', $settings, 86400);
+                        }
+                    }
+                    return is_array($settings) ? $settings : [];
+                } catch (\Throwable) {
+                    return [];
+                }
+            };
 
-            // مشاركة المتغير مع جميع الـ Views
-            view()->share('settings', $settings);
+            view()->composer('*', function ($view) use ($loadSettings) {
+                $view->with('settings', $loadSettings());
+            });
 
             view()->composer('admin.layouts.admin', function ($view) {
                 try {

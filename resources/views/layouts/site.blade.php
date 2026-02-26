@@ -34,6 +34,21 @@
         $resolvedMetaKeywords = !empty($resolvedMetaKeywords)
             ? preg_replace('/\s+/u', ' ', strip_tags((string) $resolvedMetaKeywords))
             : null;
+        if (empty($resolvedMetaKeywords)) {
+            $kwFromCollections = [];
+            if (isset($contentKeywords) && $contentKeywords && method_exists($contentKeywords, 'pluck')) {
+                $kwFromCollections = array_merge($kwFromCollections, $contentKeywords->pluck('name')->filter()->values()->all());
+            }
+            if (isset($pageContentKeywords) && $pageContentKeywords && method_exists($pageContentKeywords, 'pluck')) {
+                $kwFromCollections = array_merge($kwFromCollections, $pageContentKeywords->pluck('name')->filter()->values()->all());
+            }
+            $kwFromCollections = array_values(array_unique(array_filter(array_map(function ($v) {
+                return preg_replace('/\s+/u', ' ', trim(strip_tags((string) $v)));
+            }, $kwFromCollections))));
+            if (!empty($kwFromCollections)) {
+                $resolvedMetaKeywords = implode(', ', $kwFromCollections);
+            }
+        }
 
         $meta_title = $resolvedMetaTitle;
         $meta_description = $resolvedMetaDescription;
@@ -91,14 +106,26 @@
 
 
     <meta property="og:url" content="{{ $canonicalUrl }}">
-    <meta property="og:site_name" content="{{ $resolvedMetaTitle ?? $settings['site_name']}}">
-    <meta property="og:type" content="{{ request()->routeIs('blog.show') ? 'article' : 'website' }}">
+    <meta property="og:site_name" content="{{ $settings['site_name'] ?? config('app.name') }}">
+    <meta property="og:type" content="{{ request()->routeIs('blog.show', 'services.show', 'projects.show') ? 'article' : 'website' }}">
 
-    @if (request()->routeIs('blog.show') && isset($post) && is_object($post))
+    @php
+        $articleModel = null;
+        if (request()->routeIs('blog.show') && isset($post) && is_object($post)) {
+            $articleModel = $post;
+        } elseif (request()->routeIs('services.show') && isset($service) && is_object($service)) {
+            $articleModel = $service;
+        } elseif (request()->routeIs('projects.show') && isset($project) && is_object($project)) {
+            $articleModel = $project;
+        }
+    @endphp
+
+    @if (!empty($articleModel))
         @php
-            $publishedAt = $post->published_at ?? ($post->created_at ?? null);
+            $publishedAt = $articleModel->published_at ?? ($articleModel->created_at ?? null);
             $publishedIso = $publishedAt ? $publishedAt->toIso8601String() : null;
-            $modifiedIso = $post->updated_at ?? null ? $post->updated_at->toIso8601String() : null;
+            $modifiedAt = $articleModel->updated_at ?? null;
+            $modifiedIso = $modifiedAt ? $modifiedAt->toIso8601String() : null;
         @endphp
         @if (!empty($publishedIso))
             <meta property="article:published_time" content="{{ $publishedIso }}">
@@ -115,6 +142,7 @@
             @endforeach
         @endif
     @endif
+    
 
     @php
         $siteLogoImage =
@@ -196,7 +224,6 @@
     @endif
 
     <meta property="og:locale" content="ar_SA">
-    <meta property="og:site_name" content="{{ $settings['site_name'] ?? config('app.name') }}">
     {{-- ===== Twitter Cards (ضروري لمنصة X) ===== --}}
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="{{ $resolvedMetaTitle ?? ($settings['site_name'] ?? config('app.name')) }}">

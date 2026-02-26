@@ -3,7 +3,7 @@
 @section('meta_title', $project->meta_title ?: $project->title)
 @section('meta_description', $meta_description ?: Str::limit(strip_tags($project->description ?? ''), 160))
 @section('meta_keywords', $meta_keywords)
-<!--$project->title-->
+{{-- $project->title --}}
 
 @section('content')
 

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Mail\ReplyToMessageMail;
 use App\Models\Message;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
@@ -49,17 +50,28 @@ class MessageController extends Controller
         } elseif ($action === 'mark_unread') {
             $message->is_read = false;
             $message->save();
-        } elseif ($action === 'reply') {
-            $request->validate([
-                'reply_content' => ['required', 'string', 'max:2000'],
-            ]);
-            Mail::raw($request->input('reply_content'), function ($m) use ($message) {
-                $m->to($message->email)->subject('رد على رسالتك: '.$message->subject);
-            });
-            $message->reply_content = $request->input('reply_content');
-            $message->replied_at = now();
-            $message->save();
         }
+
+        return redirect()->back();
+    }
+
+    public function reply(Request $request, string $id)
+    {
+        $message = Message::findOrFail($id);
+        $validated = $request->validate([
+            'reply_content' => ['required', 'string', 'max:2000'],
+        ]);
+        $data = [
+            'name' => $message->name,
+            'email' => $message->email,
+            'subject' => $message->subject,
+            'original_message' => $message->message,
+            'reply_content' => $validated['reply_content'],
+        ];
+        Mail::to($message->email)->queue(new ReplyToMessageMail($data));
+        $message->reply_content = $validated['reply_content'];
+        $message->replied_at = now();
+        $message->save();
 
         return redirect()->back();
     }
