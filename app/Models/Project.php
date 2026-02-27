@@ -34,6 +34,18 @@ class Project extends Model
         return $this->belongsTo(Service::class, 'service_id');
     }
 
+    /** أسئلة شائعة فعّالة فقط (للعرض في الموقع) */
+    public function faqs()
+    {
+        return $this->hasMany(Faq::class, 'project_id')->where('active', true)->orderBy('id');
+    }
+
+    /** كل الأسئلة الشائعة (للوحة التحكم) */
+    public function allFaqs()
+    {
+        return $this->hasMany(Faq::class, 'project_id')->orderBy('id');
+    }
+
     public function getRouteKeyName()
     {
         return 'slug';

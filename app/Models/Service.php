@@ -32,6 +32,18 @@ class Service extends Model
         return $this->hasMany(Project::class, 'service_id');
     }
 
+    /** أسئلة شائعة فعّالة فقط (للعرض في الموقع) */
+    public function faqs()
+    {
+        return $this->hasMany(Faq::class, 'service_id')->where('active', true)->orderBy('id');
+    }
+
+    /** كل الأسئلة الشائعة (للوحة التحكم) */
+    public function allFaqs()
+    {
+        return $this->hasMany(Faq::class, 'service_id')->orderBy('id');
+    }
+
     public function iconClass(): ?string
     {
         if (!is_string($this->icon) || $this->icon === '') {

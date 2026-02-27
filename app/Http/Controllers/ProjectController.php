@@ -26,7 +26,7 @@ class ProjectController extends Controller
     public function show($slug)
     {
         $settings = Setting::all()->pluck('value', 'key');
-        $project = Project::with('images')->where('active', true)->where('slug', $slug)->first();
+        $project = Project::with(['images', 'faqs'])->where('active', true)->where('slug', $slug)->first();
         if (! $project) {
             return redirect()->route('projects.index')->with('error', 'عذراً، المشروع المطلوب غير موجود.');
         }

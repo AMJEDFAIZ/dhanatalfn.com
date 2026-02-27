@@ -197,7 +197,7 @@
                         <h6 class="fw-bold mb-2">المعرض</h6>
                         @foreach($previews['gallery'] as $item)
                         <div class="section-preview-item d-flex align-items-center mb-2">
-                            <img src="{{ asset($item->image_path ? 'storage/'.$item->image_path : 'placeholder.png') }}" class="section-preview-thumb rounded me-2" alt="{{ 'صورة #'.$item->id }}">
+                            <img src="{{ $item->image_path ? asset('storage/'.$item->image_path) : asset('assets/img/logo.png') }}" class="section-preview-thumb rounded me-2" alt="{{ $item->title ?: 'صورة #'.$item->id }}">
                             <div class="flex-grow-1">
                                 <span class="section-preview-title d-block">صورة #{{ $item->id }}</span>
                                 <div class="section-preview-meta">{{ $item->created_at->format('Y-m-d') }}</div>

@@ -22,7 +22,7 @@ class ProjectController extends Controller
 {
     public function index()
     {
-        $projects = Project::orderBy('sort_order')->paginate(10);
+        $projects = Project::with('service')->orderBy('sort_order')->paginate(10);
 
         return view('admin.projects.index', compact('projects'));
     }
@@ -59,9 +59,12 @@ class ProjectController extends Controller
             'keyword_primary_ids.*' => 'integer|exists:keywords,id',
             'keyword_weights' => 'nullable|array',
             'keyword_weights.*' => 'nullable|integer|min:0|max:65535',
+            'faqs' => 'nullable|array',
+            'faqs.*.question' => 'nullable|string',
+            'faqs.*.answer' => 'nullable|string',
         ]);
 
-        $data = $request->except('main_image', 'meta_keyword_ids', 'meta_keyword_names', 'content_keyword_ids', 'content_keyword_names');
+        $data = $request->except('main_image', 'meta_keyword_ids', 'meta_keyword_names', 'content_keyword_ids', 'content_keyword_names', 'faqs');
         $newImagePath = null;
 
 
@@ -94,6 +97,17 @@ class ProjectController extends Controller
 
             DB::transaction(function () use ($data, $request, $keywordService, $userId) {
                 $project = Project::create($data);
+                if ($request->has('faqs')) {
+                    foreach ($request->faqs as $faq) {
+                        if (!empty($faq['question']) && !empty($faq['answer'])) {
+                            $project->allFaqs()->create([
+                                'question' => $faq['question'],
+                                'answer' => $faq['answer'],
+                                'active' => true,
+                            ]);
+                        }
+                    }
+                }
 
                 $metaIds = $keywordService->resolveIdsOrFail(
                     $request->input('meta_keyword_ids', []),
@@ -132,7 +146,7 @@ class ProjectController extends Controller
     public function edit(Project $project)
     {
         $services = Service::where('active', true)->orderBy('title')->get();
-        $project->load('keywords');
+        $project->load(['keywords', 'allFaqs']);
         $keywords = Keyword::where('active', true)->orderBy('name')->get();
 
         $metaKeywordIds = $project->keywords
@@ -188,9 +202,12 @@ class ProjectController extends Controller
             'keyword_primary_ids.*' => 'integer|exists:keywords,id',
             'keyword_weights' => 'nullable|array',
             'keyword_weights.*' => 'nullable|integer|min:0|max:65535',
+            'faqs' => 'nullable|array',
+            'faqs.*.question' => 'nullable|string',
+            'faqs.*.answer' => 'nullable|string',
         ]);
 
-        $data = $request->except('main_image', 'meta_keyword_ids', 'meta_keyword_names', 'content_keyword_ids', 'content_keyword_names');
+        $data = $request->except('main_image', 'meta_keyword_ids', 'meta_keyword_names', 'content_keyword_ids', 'content_keyword_names', 'faqs');
         $newImagePath = null;
         $oldImagePath = $project->main_image;
 
@@ -218,6 +235,20 @@ class ProjectController extends Controller
 
             DB::transaction(function () use ($project, $data, $request, $keywordService, $userId) {
                 $project->update($data);
+                if ($request->has('faqs')) {
+                    $project->allFaqs()->delete();
+                    foreach ($request->faqs as $faq) {
+                        if (!empty($faq['question']) && !empty($faq['answer'])) {
+                            $project->allFaqs()->create([
+                                'question' => $faq['question'],
+                                'answer' => $faq['answer'],
+                                'active' => true,
+                            ]);
+                        }
+                    }
+                } elseif ($request->exists('faqs_submit_indicator')) {
+                    $project->allFaqs()->delete();
+                }
 
                 $metaIds = $keywordService->resolveIdsOrFail(
                     $request->input('meta_keyword_ids', []),

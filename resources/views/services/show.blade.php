@@ -62,6 +62,25 @@
                     <p class="text-gray-600 mb-6 leading-relaxed text-lg">
                         {!! nl2br(e($service->description)) !!}
                     </p>
+
+                    @if ($service->faqs && $service->faqs->count() > 0)
+                    <div id="faq" class="mt-12 border-t border-gray-100 pt-8">
+                        <h3 class="text-2xl font-bold text-accent mb-6">الأسئلة الشائعة</h3>
+                        <div class="space-y-4">
+                            @foreach ($service->faqs as $faq)
+                            <div class="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
+                                <div class="p-4 bg-gray-200 font-bold text-gray-800 border-b border-gray-100">
+                                    {{ $faq->question }}
+                                </div>
+                                <div class="p-4 text-gray-600 leading-relaxed break-words overflow-hidden font-bold">
+                                    {{ $faq->answer }}
+                                </div>
+                            </div>
+                            @endforeach
+                        </div>
+                    </div>
+                    @endif
+
                     <div
                         class="mt-12 pt-8 border-t border-gray-200 flex flex-col md:flex-row justify-between items-center gap-6">
 

@@ -59,9 +59,12 @@ class ServiceController extends Controller
             'keyword_primary_ids.*' => 'integer|exists:keywords,id',
             'keyword_weights' => 'nullable|array',
             'keyword_weights.*' => 'nullable|integer|min:0|max:65535',
+            'faqs' => 'nullable|array',
+            'faqs.*.question' => 'nullable|string',
+            'faqs.*.answer' => 'nullable|string',
         ]);
 
-        $data = $request->except('image', 'project_ids', 'meta_keyword_ids', 'meta_keyword_names', 'content_keyword_ids', 'content_keyword_names');
+        $data = $request->except('image', 'project_ids', 'meta_keyword_ids', 'meta_keyword_names', 'content_keyword_ids', 'content_keyword_names', 'faqs');
         $newImagePath = null;
 
         if ($request->hasFile('image')) {
@@ -92,6 +95,17 @@ class ServiceController extends Controller
                 $service = Service::create($data);
                 if ($request->has('project_ids')) {
                     Project::whereIn('id', $request->project_ids)->update(['service_id' => $service->id]);
+                }
+                if ($request->has('faqs')) {
+                    foreach ($request->faqs as $faq) {
+                        if (!empty($faq['question']) && !empty($faq['answer'])) {
+                            $service->faqs()->create([
+                                'question' => $faq['question'],
+                                'answer' => $faq['answer'],
+                                'active' => true,
+                            ]);
+                        }
+                    }
                 }
 
                 $metaIds = $keywordService->resolveIdsOrFail(
@@ -133,7 +147,7 @@ class ServiceController extends Controller
     public function edit(Service $service)
     {
         $projects = Project::whereNull('service_id')->orWhere('service_id', $service->id)->get();
-        $service->load('keywords');
+        $service->load(['keywords', 'allFaqs']);
         $keywords = Keyword::where('active', true)->orderBy('name')->get();
 
         $metaKeywordIds = $service->keywords
@@ -192,9 +206,12 @@ class ServiceController extends Controller
             'keyword_primary_ids.*' => 'integer|exists:keywords,id',
             'keyword_weights' => 'nullable|array',
             'keyword_weights.*' => 'nullable|integer|min:0|max:65535',
+            'faqs' => 'nullable|array',
+            'faqs.*.question' => 'nullable|string',
+            'faqs.*.answer' => 'nullable|string',
         ]);
 
-        $data = $request->except('image', 'meta_keyword_ids', 'meta_keyword_names', 'content_keyword_ids', 'content_keyword_names');
+        $data = $request->except('image', 'meta_keyword_ids', 'meta_keyword_names', 'content_keyword_ids', 'content_keyword_names', 'faqs');
         $newImagePath = null;
         $oldImagePath = $service->image_path;
 
@@ -223,6 +240,20 @@ class ServiceController extends Controller
 
             DB::transaction(function () use ($request, $service, $data, $keywordService, $userId) {
                 $service->update($data);
+                if ($request->has('faqs')) {
+                    $service->allFaqs()->delete();
+                    foreach ($request->faqs as $faq) {
+                        if (!empty($faq['question']) && !empty($faq['answer'])) {
+                            $service->allFaqs()->create([
+                                'question' => $faq['question'],
+                                'answer' => $faq['answer'],
+                                'active' => true,
+                            ]);
+                        }
+                    }
+                } elseif ($request->exists('faqs_submit_indicator')) {
+                    $service->allFaqs()->delete();
+                }
                 if ($request->has('project_ids')) {
                     $currentIds = $service->projects()->pluck('id')->map(fn($id) => (int) $id)->all();
                     $newIds = collect($request->project_ids)->map(fn($id) => (int) $id)->all();

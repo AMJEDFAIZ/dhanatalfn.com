@@ -90,6 +90,38 @@
             </div>
 
             <hr class="my-3">
+            <h3 class="h6 fw-bold mb-3">الأسئلة الشائعة (FAQ - Schema)</h3>
+            <input type="hidden" name="faqs_submit_indicator" value="1">
+            <div id="faqs-container">
+                @php
+                $faqs = old('faqs', $project->allFaqs);
+                @endphp
+                @foreach($faqs as $index => $faq)
+                @php
+                $question = is_array($faq) ? ($faq['question'] ?? '') : $faq->question;
+                $answer = is_array($faq) ? ($faq['answer'] ?? '') : $faq->answer;
+                @endphp
+                <div class="card mb-3 faq-item">
+                    <div class="card-body bg-light">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="fw-bold">سؤال {{ $index + 1 }}</span>
+                            <button type="button" class="btn btn-sm btn-danger remove-faq">حذف</button>
+                        </div>
+                        <div class="mb-2">
+                            <input type="text" name="faqs[{{ $index }}][question]" class="form-control" placeholder="السؤال" value="{{ $question }}">
+                        </div>
+                        <div>
+                            <textarea name="faqs[{{ $index }}][answer]" class="form-control" placeholder="الإجابة" rows="2">{{ $answer }}</textarea>
+                        </div>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+            <button type="button" class="btn btn-sm btn-success mb-3" id="add-faq">
+                <i class="fas fa-plus"></i> إضافة سؤال جديد
+            </button>
+
+            <hr class="my-3">
             <h3 class="h6 fw-bold mb-3">تحسين محركات البحث (SEO)</h3>
 
             <div class="mb-3">
@@ -122,4 +154,35 @@
 @push('styles')
 @endpush
 @push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        let faqIndex = {{ is_array(old('faqs')) ? count(old('faqs')) : $project->allFaqs->count() }};
+        document.getElementById('add-faq').addEventListener('click', function() {
+            const container = document.getElementById('faqs-container');
+            const template = `
+                <div class="card mb-3 faq-item">
+                    <div class="card-body bg-light">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="fw-bold">سؤال جديد</span>
+                            <button type="button" class="btn btn-sm btn-danger remove-faq">حذف</button>
+                        </div>
+                        <div class="mb-2">
+                            <input type="text" name="faqs[${faqIndex}][question]" class="form-control" placeholder="السؤال">
+                        </div>
+                        <div>
+                            <textarea name="faqs[${faqIndex}][answer]" class="form-control" placeholder="الإجابة" rows="2"></textarea>
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', template);
+            faqIndex++;
+        });
+        document.getElementById('faqs-container').addEventListener('click', function(e) {
+            if (e.target.classList.contains('remove-faq')) {
+                e.target.closest('.faq-item').remove();
+            }
+        });
+    });
+</script>
 @endpush

@@ -82,7 +82,7 @@ class ServiceController extends Controller
     {
         // جلب الإعدادات
         $settings = Setting::pluck('value', 'key')->all();
-        $service = Service::where('active', true)->where('slug', $slug)->first();
+        $service = Service::with('faqs')->where('active', true)->where('slug', $slug)->first();
 
         if (! $service) {
             return redirect()->route('services.index')->with('error', 'عذراً، الخدمة المطلوبة غير موجودة.');
